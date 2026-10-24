@@ -1,0 +1,770 @@
+{
+  "schemaVersion": 1,
+  "rulesVersion": "2026.10.1",
+  "updatedAt": "2026-10-23",
+  "description": "Base oficial de substâncias restritas, corantes, alimentos e medicamentos para Deficiência de G6PD (CPIC, OMS, SBP, APAE e Ministério da Saúde).",
+  "sources": [
+    { "name": "CPIC Guideline for G6PD", "url": "https://cpicpgx.org/guidelines/cpic-guideline-for-g6pd/" },
+    { "name": "Sociedade Brasileira de Pediatria (SBP) / SPSP", "url": "https://www.spsp.org.br/" },
+    { "name": "EBSERH / Ministério da Saúde (Cartilha G6PD)", "url": "https://www.gov.br/ebserh/" },
+    { "name": "Associazione Italiana Favismo", "url": "https://www.favismo.it/" },
+    { "name": "Bulário Eletrônico da ANVISA", "url": "https://consultas.anvisa.gov.br/#/bulario/" }
+  ],
+  "safeLookalikes": [
+    {
+      "id": "safe-sulfato-ferroso",
+      "term": "sulfato ferroso",
+      "category": "NUTRIENTE_MINERAL",
+      "explanation": "Mineral essencial de ferro adicionado em farinhas e suplementos infantis. Não é sulfito (seguro)."
+    },
+    {
+      "id": "safe-sulfato-zinco",
+      "term": "sulfato de zinco",
+      "category": "NUTRIENTE_MINERAL",
+      "explanation": "Mineral de zinco seguro. A grafia 'sulfato' difere de 'sulfito' (conservante)."
+    },
+    {
+      "id": "safe-sulfato-calcio",
+      "term": "sulfato de calcio",
+      "category": "NUTRIENTE_MINERAL",
+      "explanation": "Sal mineral de cálcio comum em pães e leites fortificados. Totalmente seguro."
+    },
+    {
+      "id": "safe-sulfato-magnesio",
+      "term": "sulfato de magnesio",
+      "category": "NUTRIENTE_MINERAL",
+      "explanation": "Sal mineral de magnésio seguro."
+    },
+    {
+      "id": "safe-sulfato-cuprico",
+      "term": "sulfato cuprico",
+      "category": "NUTRIENTE_MINERAL",
+      "explanation": "Sal mineral de cobre seguro presente em fórmulas infantis."
+    },
+    {
+      "id": "safe-sulfato-manganes",
+      "term": "sulfato de manganes",
+      "category": "NUTRIENTE_MINERAL",
+      "explanation": "Sal mineral seguro."
+    },
+    {
+      "id": "safe-vitamina-k1",
+      "term": "vitamina k1",
+      "category": "VITAMINA",
+      "explanation": "Fitomenadiona (Vitamina K1 natural). Segura (diferente da menadiona/K3 sintética)."
+    },
+    {
+      "id": "safe-fitomenadiona",
+      "term": "fitomenadiona",
+      "category": "VITAMINA",
+      "explanation": "Forma natural da Vitamina K1 administrada ao nascer. Segura para G6PD."
+    },
+    {
+      "id": "safe-lecitina-soja",
+      "term": "lecitina de soja",
+      "category": "EMULSIFICANTE",
+      "explanation": "Emulsificante alimentar (INS 322). Considerada segura no processamento alimentar para a imensa maioria das variantes."
+    },
+    {
+      "id": "safe-acido-ascorbico-alim",
+      "term": "acido ascorbico",
+      "category": "ANTIOXIDANTE_NUTRIENTE",
+      "explanation": "Vitamina C em dosagem alimentar normal (INS 300). Segura (apenas megadoses acima de 1g/injetáveis exigem restrição)."
+    },
+    {
+      "id": "safe-acido-citrico",
+      "term": "acido citrico",
+      "category": "ACIDULANTE",
+      "explanation": "Acidulante alimentar seguro (INS 330)."
+    },
+    {
+      "id": "safe-acido-folico",
+      "term": "acido folico",
+      "category": "VITAMINA",
+      "explanation": "Vitamina B9 segura, frequentemente adicionada em farinhas enriquecidas no Brasil."
+    }
+  ],
+  "rules": [
+    {
+      "id": "dye-tartrazina-102",
+      "name": "Tartrazina (Amarelo 5)",
+      "category": "DYE_ARTIFICIAL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "102",
+      "eNumber": "E102",
+      "synonyms": [
+        "tartrazina", "tartrazine", "amarelo tartrazina", "amarelo 5", "amarelo no 5",
+        "yellow 5", "fd&c yellow 5", "ci 19140", "acid yellow 23", "ins 102", "ins102", "e102", "e-102"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Corante azoico sintético derivado do alcatrão de hulha. Restrito em protocolos pediátricos brasileiros (SBP/APAE) por risco de indução de estresse oxidativo e hipersensibilidade."
+    },
+    {
+      "id": "dye-amarelo-crepusculo-110",
+      "name": "Amarelo Crepúsculo (Sunset Yellow / Amarelo 6)",
+      "category": "DYE_ARTIFICIAL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "110",
+      "eNumber": "E110",
+      "synonyms": [
+        "amarelo crepusculo", "amarelo ocaso", "sunset yellow", "sunset yellow fcf",
+        "amarelo 6", "amarelo no 6", "yellow 6", "fd&c yellow 6", "ci 15985",
+        "orange yellow s", "ins 110", "ins110", "e110", "e-110"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Corante azoico sintético amplamente restrito em cardápios escolares e xaropes pediátricos no Brasil."
+    },
+    {
+      "id": "dye-azorrubina-122",
+      "name": "Azorrubina (Carmoisina)",
+      "category": "DYE_ARTIFICIAL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "122",
+      "eNumber": "E122",
+      "synonyms": ["azorrubina", "carmoisina", "carmoisine", "ci 14720", "ins 122", "ins122", "e122", "e-122"],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Corante vermelho azoico sintético restrito por precaução oxidativa."
+    },
+    {
+      "id": "dye-amaranto-123",
+      "name": "Amaranto (Bordeaux S)",
+      "category": "DYE_ARTIFICIAL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "123",
+      "eNumber": "E123",
+      "synonyms": ["amaranto", "amaranth", "fd&c red 2", "ci 16185", "ins 123", "ins123", "e123", "e-123"],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Corante azoico vermelho de origem sintética restrito em pediatria."
+    },
+    {
+      "id": "dye-ponceau-124",
+      "name": "Ponceau 4R (Vermelho Cochinilha A)",
+      "category": "DYE_ARTIFICIAL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "124",
+      "eNumber": "E124",
+      "synonyms": [
+        "ponceau 4r", "vermelho cochinilha a", "cochineal red a", "brilliant scarlet 4r",
+        "ci 16255", "ins 124", "ins124", "e124", "e-124"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Corante vermelho sintético azoico restrito nos protocolos pediátricos."
+    },
+    {
+      "id": "dye-eritrosina-127",
+      "name": "Eritrosina (Vermelho 3)",
+      "category": "DYE_ARTIFICIAL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "127",
+      "eNumber": "E127",
+      "synonyms": [
+        "eritrosina", "erythrosine", "vermelho 3", "vermelho no 3", "red 3",
+        "fd&c red 3", "ci 45430", "ins 127", "ins127", "e127", "e-127"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Corante sintético derivado de xanteno restrito na infância."
+    },
+    {
+      "id": "dye-vermelho-40-129",
+      "name": "Vermelho 40 (Allura Red AC)",
+      "category": "DYE_ARTIFICIAL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "129",
+      "eNumber": "E129",
+      "synonyms": [
+        "vermelho 40", "vermelho allura", "allura red", "vermelho allura ac",
+        "red 40", "fd&c red 40", "ci 16035", "ins 129", "ins129", "e129", "e-129"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Corante azoico sintético muito frequente em xaropes pediátricos de sabor morango/frutas e guloseimas. Restrito em protocolos pediátricos."
+    },
+    {
+      "id": "dye-azul-patente-131",
+      "name": "Azul Patente V",
+      "category": "DYE_ARTIFICIAL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "131",
+      "eNumber": "E131",
+      "synonyms": ["azul patente v", "patent blue v", "ci 42051", "ins 131", "ins131", "e131", "e-131"],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Corante triarilmetano sintético restrito por precaução."
+    },
+    {
+      "id": "dye-indigotina-132",
+      "name": "Indigotina (Carmim de Índigo / Azul 2)",
+      "category": "DYE_ARTIFICIAL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "132",
+      "eNumber": "E132",
+      "synonyms": [
+        "indigotina", "carmim de indigo", "indigo carmine", "azul 2", "blue 2",
+        "fd&c blue 2", "ci 73015", "ins 132", "ins132", "e132", "e-132"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Corante sintético derivado de indigóide restrito em pediatria."
+    },
+    {
+      "id": "dye-azul-brilhante-133",
+      "name": "Azul Brilhante FCF (Azul 1)",
+      "category": "DYE_ARTIFICIAL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "133",
+      "eNumber": "E133",
+      "synonyms": [
+        "azul brilhante", "azul brilhante fcf", "brilliant blue", "brilliant blue fcf",
+        "azul 1", "blue 1", "fd&c blue 1", "ci 42090", "ins 133", "ins133", "e133", "e-133"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Corante triarilmetano sintético comum em doces e gelatinas azuis. Restrito."
+    },
+    {
+      "id": "dye-verde-rapido-143",
+      "name": "Verde Rápido FCF",
+      "category": "DYE_ARTIFICIAL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "143",
+      "eNumber": "E143",
+      "synonyms": [
+        "verde rapido", "verde rapido fcf", "fast green", "fast green fcf",
+        "fd&c green 3", "ci 42053", "ins 143", "ins143", "e143", "e-143"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Corante triarilmetano sintético restrito nos protocolos pediátricos."
+    },
+    {
+      "id": "dye-caramelo-iv-150d",
+      "name": "Caramelo IV (Processo Sulfito-Amônia)",
+      "category": "DYE_CARAMEL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "150d",
+      "eNumber": "E150d",
+      "synonyms": [
+        "caramelo iv", "caramelo 4", "caramelo processo sulfito-amonia", "caramelo processo sulfito amonia",
+        "sulfite ammonia caramel", "ammonia sulfite caramel", "ins 150d", "ins150d", "ins-150d",
+        "ins 150 iv", "ins 150iv", "e150d", "e-150d"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Produzido com compostos sulfurados/sulfitos. O risco vem da presença de resíduos de sulfitos oxidantes."
+    },
+    {
+      "id": "dye-caramelo-iii-150c",
+      "name": "Caramelo III (Processo Amônia)",
+      "category": "DYE_CARAMEL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "150c",
+      "eNumber": "E150c",
+      "synonyms": [
+        "caramelo iii", "caramelo 3", "caramelo processo amonia", "ammonia caramel",
+        "ins 150c", "ins150c", "ins-150c", "ins 150 iii", "ins 150iii", "e150c", "e-150c"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Processado com amônia. Restrito em protocolos pediátricos brasileiros."
+    },
+    {
+      "id": "dye-caramelo-ii-150b",
+      "name": "Caramelo II (Processo Sulfito Cáustico)",
+      "category": "DYE_CARAMEL",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "150b",
+      "eNumber": "E150b",
+      "synonyms": [
+        "caramelo ii", "caramelo 2", "caramelo sulfito caustico", "caustic sulfite caramel",
+        "ins 150b", "ins150b", "e150b", "e-150b"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Leva sulfitos cáusticos na preparação. Risco por resíduos de sulfitos."
+    },
+    {
+      "id": "dye-caramelo-generico-ambiguo",
+      "name": "Corante Caramelo (Não Especificado)",
+      "category": "DYE_CARAMEL",
+      "riskLevel": "CAUTION",
+      "synonyms": ["corante caramelo", "corante natural caramelo", "caramelo simples ou composto", "caramel color"],
+      "protocolSource": "ANVISA",
+      "isAmbiguous": true,
+      "clinicalMechanism": "O fabricante listou apenas 'corante caramelo' sem especificar o tipo (I, II, III ou IV). Se for Caramelo IV (comum em biscoitos e refrigerantes escuros), contém sulfitos. Recomenda-se cautela ou confirmação com o SAC do fabricante."
+    },
+    {
+      "id": "dye-caramelo-i-150a",
+      "name": "Caramelo I (Simples)",
+      "category": "DYE_NATURAL",
+      "riskLevel": "SAFE",
+      "insCode": "150a",
+      "eNumber": "E150a",
+      "synonyms": ["caramelo i", "caramelo 1", "caramelo simples", "plain caramel", "ins 150a", "ins150a", "e150a", "e-150a"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Obtido pelo aquecimento simples de açúcares sem adição de amônia ou sulfitos. Seguro para G6PD."
+    },
+    {
+      "id": "sulfite-metabissulfito-sodio-223",
+      "name": "Metabissulfito de Sódio",
+      "category": "SULFITE",
+      "riskLevel": "HIGH_RISK",
+      "insCode": "223",
+      "eNumber": "E223",
+      "synonyms": [
+        "metabissulfito", "metabisulfito", "metabissulfito de sodio", "metabissulfito sodico", "metabisulfito de sodio",
+        "sodium metabisulfite", "disodium disulfite", "ins 223", "ins223", "e223", "e-223"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Potente agente conservante sulfurado com capacidade de induzir estresse oxidativo nas hemácias desprotegidas. Muito frequente em biscoitos secos, doces de frutas e sucos concentrados."
+    },
+    {
+      "id": "sulfite-metabissulfito-potassio-224",
+      "name": "Metabissulfito de Potássio",
+      "category": "SULFITE",
+      "riskLevel": "HIGH_RISK",
+      "insCode": "224",
+      "eNumber": "E224",
+      "synonyms": [
+        "metabissulfito de potassio", "metabisulfito de potassio", "potassium metabisulfite",
+        "ins 224", "ins224", "e224", "e-224"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Agente oxidante sulfurado similar ao metabissulfito de sódio."
+    },
+    {
+      "id": "sulfite-dioxido-enxofre-220",
+      "name": "Dióxido de Enxofre",
+      "category": "SULFITE",
+      "riskLevel": "HIGH_RISK",
+      "insCode": "220",
+      "eNumber": "E220",
+      "synonyms": ["dioxido de enxofre", "sulfur dioxide", "anidrido sulfuroso", "ins 220", "ins220", "e220", "e-220"],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Gás sulfurado conservante com potencial oxidante."
+    },
+    {
+      "id": "sulfite-bissulfito-sodio-222",
+      "name": "Bissulfito de Sódio / Sulfito de Sódio",
+      "category": "SULFITE",
+      "riskLevel": "HIGH_RISK",
+      "insCode": "222",
+      "eNumber": "E222",
+      "synonyms": [
+        "bissulfito de sodio", "bisulfito de sodio", "sulfito de sodio", "sodium bisulfite",
+        "sodium sulfite", "ins 221", "ins 222", "ins221", "ins222", "e221", "e222"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Sais de sulfito com capacidade oxidante direta em eritrócitos deficientes em GSH."
+    },
+    {
+      "id": "sulfite-generico",
+      "name": "Sulfitos (Termo Genérico)",
+      "category": "SULFITE",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["conservador sulfito", "conservante sulfito", "sulfitos", "contem sulfitos", "sulfites"],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Qualquer menção genérica a compostos de sulfito no rótulo exige bloqueio de segurança."
+    },
+    {
+      "id": "antiox-tbhq-319",
+      "name": "TBHQ (Terc-butil-hidroquinona)",
+      "category": "ANTIOXIDANT",
+      "riskLevel": "RESTRICTED_BR",
+      "insCode": "319",
+      "eNumber": "E319",
+      "synonyms": [
+        "tbhq", "terc-butil-hidroquinona", "terc butil hidroquinona", "butilhidroquinona terciaria",
+        "tertiary butylhydroquinone", "ins 319", "ins319", "e319", "e-319"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Derivado sintético de hidroquinona usado para prevenir rancidez em óleos e biscoitos. Restrito em protocolos pediátricos preventivos."
+    },
+    {
+      "id": "antiox-bha-320",
+      "name": "BHA (Butil-hidroxianisol)",
+      "category": "ANTIOXIDANT",
+      "riskLevel": "CAUTION",
+      "insCode": "320",
+      "eNumber": "E320",
+      "synonyms": ["bha", "butil-hidroxianisol", "butilhidroxianisol", "butylated hydroxyanisole", "ins 320", "ins320", "e320"],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Antioxidante fenólico sintético. Evitado preventivamente em algumas diretrizes pediátricas."
+    },
+    {
+      "id": "antiox-bht-321",
+      "name": "BHT (Butil-hidroxitolueno)",
+      "category": "ANTIOXIDANT",
+      "riskLevel": "CAUTION",
+      "insCode": "321",
+      "eNumber": "E321",
+      "synonyms": ["bht", "butil-hidroxitolueno", "butilhidroxitolueno", "butylated hydroxytoluene", "ins 321", "ins321", "e321"],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "Antioxidante fenólico sintético. Evitado preventivamente."
+    },
+    {
+      "id": "dye-urucum-160b",
+      "name": "Urucum (Bixina / Norbixina / Annatto)",
+      "category": "DYE_NATURAL",
+      "riskLevel": "SAFE",
+      "insCode": "160b",
+      "eNumber": "E160b",
+      "synonyms": ["urucum", "extrato de urucum", "corante natural de urucum", "bixina", "norbixina", "annatto", "ins 160b", "ins160b", "e160b"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Pigmento natural extraído das sementes de Bixa orellana. Sem risco hemolítico comprovado internacionalmente."
+    },
+    {
+      "id": "dye-curcuma-100",
+      "name": "Cúrcuma (Curcumina / Turmeric)",
+      "category": "DYE_NATURAL",
+      "riskLevel": "SAFE",
+      "insCode": "100",
+      "eNumber": "E100",
+      "synonyms": ["curcuma", "curcumina", "turmeric", "corante curcuma", "ins 100", "ins100", "e100"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Corante vegetal natural extraído da raiz de Curcuma longa. Sem potencial oxidante eritrocitário."
+    },
+    {
+      "id": "dye-beterraba-162",
+      "name": "Beterraba (Betanina / Beet Red)",
+      "category": "DYE_NATURAL",
+      "riskLevel": "SAFE",
+      "insCode": "162",
+      "eNumber": "E162",
+      "synonyms": ["beterraba", "betanina", "beet red", "vermelho de beterraba", "ins 162", "ins162", "e162"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Extrato vegetal natural de beterraba. Seguro."
+    },
+    {
+      "id": "dye-paprica-160c",
+      "name": "Páprica (Capsantina / Capsorrubina)",
+      "category": "DYE_NATURAL",
+      "riskLevel": "SAFE",
+      "insCode": "160c",
+      "eNumber": "E160c",
+      "synonyms": ["paprica", "extrato de paprica", "capsantina", "capsorrubina", "paprika extract", "ins 160c", "ins160c", "e160c"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Extrato vegetal natural de pimentão doce. Seguro."
+    },
+    {
+      "id": "dye-clorofila-140",
+      "name": "Clorofila / Clorofilina",
+      "category": "DYE_NATURAL",
+      "riskLevel": "SAFE",
+      "insCode": "140",
+      "eNumber": "E140",
+      "synonyms": ["clorofila", "clorofilina", "chlorophyll", "ins 140", "ins140", "e140"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Pigmento verde vegetal natural. Seguro."
+    },
+    {
+      "id": "dye-antocianina-163",
+      "name": "Antocianinas (Extrato de Frutas Vermelhas/Uva)",
+      "category": "DYE_NATURAL",
+      "riskLevel": "SAFE",
+      "insCode": "163",
+      "eNumber": "E163",
+      "synonyms": ["antocianina", "antocianinas", "anthocyanin", "anthocyanins", "extrato de casca de uva", "ins 163", "ins163", "e163"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Flavonoides naturais extraídos de cascas de uvas e frutas escuras. Seguros."
+    },
+    {
+      "id": "food-fava-beans",
+      "name": "Feijão-Fava (Vicia faba) — PROIBIÇÃO ABSOLUTA",
+      "category": "FOOD_BEVERAGE",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": [
+        "fava", "feijao fava", "feijao-fava", "vicia faba", "broad bean", "broad beans",
+        "faba bean", "fava beans", "habas", "farinha de fava", "broto de fava"
+      ],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Contém vicina e convicina, glicosídeos hidrolisados em divicina e isouramil, que oxidam violentamente o GSH nas hemácias. Causa clássica do Favismo (hemólise fulminante em 24-72h)."
+    },
+    {
+      "id": "food-quinina-tonica",
+      "name": "Água Tônica / Quinina",
+      "category": "FOOD_BEVERAGE",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": [
+        "agua tonica", "quinina", "quinino", "sulfato de quinina", "cloridrato de quinina",
+        "quinine", "tonic water"
+      ],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Alcaloide aromático antimalárico com propriedade oxidante severa. Proibido em qualquer apresentação."
+    },
+    {
+      "id": "food-berberina-chas",
+      "name": "Ervas Chinesas com Berberina / Coptis chinensis",
+      "category": "FOOD_BEVERAGE",
+      "riskLevel": "CAUTION",
+      "synonyms": ["berberina", "berberine", "coptis chinensis", "huang lian", "calculus bovis", "flos lonicerae"],
+      "protocolSource": "FAVISMO_IT",
+      "clinicalMechanism": "Alcaloide isoquinolínico associado a crises hemolíticas e icterícia neonatal na literatura asiática e europeia."
+    },
+    {
+      "id": "chem-naftalina",
+      "name": "Naftalina (Naftaleno) — PROIBIÇÃO ABSOLUTA",
+      "category": "HOUSEHOLD_CHEMICAL",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["naftalina", "naftaleno", "naphthalene", "bolinhas de naftalina", "mothballs"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Hidrocarboneto aromático altamente volátil. A simples inalação de vapores de roupas guardadas com naftalina causa crises hemolíticas severas em crianças com G6PD."
+    },
+    {
+      "id": "chem-henna-ppd",
+      "name": "Henna Preta / Lawsonia inermis / PPD",
+      "category": "HOUSEHOLD_CHEMICAL",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["henna", "henna preta", "black henna", "lawsonia inermis", "lawsone", "parafenilenodiamina", "p-fenilenodiamina", "ppd"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "A lawsone e a parafenilenodiamina são absorvidas pela pele em tatuagens temporárias de praia/festas e causam hemólise maciça."
+    },
+    {
+      "id": "chem-anilina",
+      "name": "Anilina e Derivados de Alcatrão de Hulha",
+      "category": "HOUSEHOLD_CHEMICAL",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["anilina", "aniline", "corante anilina", "alcatrao de hulha", "coal tar"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Aminas aromáticas potentes indutoras de metemoglobinemia e hemólise."
+    },
+    {
+      "id": "chem-mentol-canfora",
+      "name": "Cânfora e Mentol Concentrado",
+      "category": "HOUSEHOLD_CHEMICAL",
+      "riskLevel": "CAUTION",
+      "synonyms": ["canfora", "camphor", "mentol concentrado", "balsamo de canfora"],
+      "protocolSource": "FAVISMO_IT",
+      "clinicalMechanism": "Doses elevadas ou absorção tópica excessiva de bálsamos descongestionantes em bebês podem induzir estresse oxidativo."
+    },
+    {
+      "id": "drug-dapsona",
+      "name": "Dapsona",
+      "category": "DRUG_ANTIBIOTIC",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["dapsona", "dapsone", "diaminodifenilsulfona"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Metabolitos hidroxilamina geram estresse oxidativo maciço direto nas hemácias. Contraindicação absoluta."
+    },
+    {
+      "id": "drug-nitrofurantoina",
+      "name": "Nitrofurantoína (Macrodantina)",
+      "category": "DRUG_ANTIBIOTIC",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["nitrofurantoina", "macrodantina", "nitrofurantoin"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Nitrofurano que induz hemólise oxidativa severa. Proibido em todas as diretrizes."
+    },
+    {
+      "id": "drug-furazolidona",
+      "name": "Furazolidona (Giarlam)",
+      "category": "DRUG_ANTIBIOTIC",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["furazolidona", "furazolidone", "giarlam"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Nitrofurano antibacteriano contraindicado em G6PD."
+    },
+    {
+      "id": "drug-acido-nalidixico",
+      "name": "Ácido Nalidíxico (Wintomylon)",
+      "category": "DRUG_ANTIBIOTIC",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["acido nalidixico", "nalidixic acid", "wintomylon"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Quinolona de 1ª geração com risco hemolítico documentado."
+    },
+    {
+      "id": "drug-sulfametoxazol-trimetoprima",
+      "name": "Sulfametoxazol + Trimetoprima (Bactrim)",
+      "category": "DRUG_ANTIBIOTIC",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": [
+        "sulfametoxazol", "bactrim", "bactrin", "trimetoprima", "sulfametoxazol + trimetoprima",
+        "sulfametoxazol e trimetoprima", "co-trimoxazole", "cotrimoxazol", "infeclin"
+      ],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Sulfonamida que desencadeia hemólise oxidativa aguda. Evitar rigorosamente."
+    },
+    {
+      "id": "drug-sulfadiazina",
+      "name": "Sulfadiazina (inclusive Sulfadiazina de Prata)",
+      "category": "DRUG_ANTIBIOTIC",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["sulfadiazina", "sulfadiazine", "sulfadiazina de prata", "silvederma", "dermazine"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Sulfonamida oxidante de alto risco."
+    },
+    {
+      "id": "drug-sulfassalazina",
+      "name": "Sulfassalazina (Azulfin)",
+      "category": "DRUG_ANTIBIOTIC",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["sulfassalazina", "sulfasalazine", "azulfin"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Sulfonamida anti-inflamatória proibida na G6PD."
+    },
+    {
+      "id": "drug-fenazopiridina",
+      "name": "Fenazopiridina (Pyridium)",
+      "category": "DRUG_ANALGESIC",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["fenazopiridina", "pyridium", "phenazopyridine", "urovit"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Analgésico urinário azoico com altíssimo potencial de gerar metemoglobinemia e hemólise severa."
+    },
+    {
+      "id": "drug-primaquina",
+      "name": "Primaquina",
+      "category": "DRUG_ANTIMALARIAL",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["primaquina", "primaquine"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "8-aminoquinolina clássica indutora de hemólise aguda em indivíduos com deficiência de G6PD."
+    },
+    {
+      "id": "drug-tafenoquina",
+      "name": "Tafenoquina",
+      "category": "DRUG_ANTIMALARIAL",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["tafenoquina", "tafenoquine", "krintafel", "arakoda"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Antimalárico de meia-vida longa com risco hemolítico severo prolongado. Exige teste prévio de G6PD antes de qualquer uso."
+    },
+    {
+      "id": "drug-rasburicase",
+      "name": "Rasburicase / Pegloticase",
+      "category": "DRUG_URICOLYTIC",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["rasburicase", "pegloticase", "fasturtec", "krystexxa"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Enzimas urato-oxidases recombinantes que convertem ácido úrico gerando peróxido de hidrogênio (H2O2) diretamente na circulação sanguínea. Contraindicação absoluta."
+    },
+    {
+      "id": "drug-azul-metileno",
+      "name": "Azul de Metileno / Azul de Toluidina",
+      "category": "DRUG_OTHER",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["azul de metileno", "methylene blue", "azul de toluidina", "toluidine blue", "cloreto de metiltioninio"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Depende de NADPH para agir; na ausência deste, atua como oxidante direto e agrava catastroficamente a anemia hemolítica."
+    },
+    {
+      "id": "drug-vitamina-k3",
+      "name": "Vitamina K3 (Menadiona)",
+      "category": "DRUG_VITAMIN",
+      "riskLevel": "HIGH_RISK",
+      "synonyms": ["menadiona", "vitamina k3", "menadione", "menadiona bissulfito"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Forma hidrossolúvel sintética que induz estresse oxidativo e icterícia. Nota: A Vitamina K1 (fitomenadiona) é segura."
+    },
+    {
+      "id": "drug-dipirona-metamizol",
+      "name": "Dipirona (Metamizol)",
+      "category": "DRUG_ANALGESIC",
+      "riskLevel": "RESTRICTED_BR",
+      "synonyms": [
+        "dipirona", "metamizol", "novalgina", "maxalgina", "dipirona sodica",
+        "dipirona monoidratada", "anador", "lisador", "magnopyrol", "metamizole"
+      ],
+      "protocolSource": "BRAZIL_SBP_APAE",
+      "clinicalMechanism": "No Brasil, os protocolos pediátricos de triagem neonatal (SBP, APAE e Ministério da Saúde) restringem a Dipirona por precaução. Embora estudos internacionais mostrem baixo risco em doses habituais, a diretriz pediátrica brasileira recomenda substituí-la por Ibuprofeno ou Paracetamol."
+    },
+    {
+      "id": "drug-aspirina-aas",
+      "name": "AAS / Ácido Acetilsalicílico (Aspirina)",
+      "category": "DRUG_ANALGESIC",
+      "riskLevel": "CAUTION",
+      "synonyms": ["acido acetilsalicilico", "aspirina", "aas", "aspirinetas", "acetylsalicylic acid", "aspirin"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Risco hemolítico em doses elevadas. Além disso, em crianças febris é contraindicado pelo risco de Síndrome de Reye."
+    },
+    {
+      "id": "drug-fluoroquinolonas",
+      "name": "Fluoroquinolonas (Ciprofloxacino, Norfloxacino, Moxifloxacino)",
+      "category": "DRUG_ANTIBIOTIC",
+      "riskLevel": "CAUTION",
+      "synonyms": ["ciprofloxacino", "norfloxacino", "moxifloxacino", "levofloxacino", "cipro", "profloxin"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Podem induzir estresse oxidativo moderado; uso sob estrita avaliação médica."
+    },
+    {
+      "id": "drug-cloroquina",
+      "name": "Cloroquina / Hidroxicloroquina",
+      "category": "DRUG_ANTIMALARIAL",
+      "riskLevel": "CAUTION",
+      "synonyms": ["cloroquina", "hidroxicloroquina", "reumaquin", "plaqquinol", "plaquinol", "chloroquine"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Risco hemolítico intermediário. Exige acompanhamento do hematologista."
+    },
+    {
+      "id": "drug-vitamina-c-megadose",
+      "name": "Vitamina C em Megadoses (Suplementos Efervescentes / Injetável)",
+      "category": "DRUG_VITAMIN",
+      "riskLevel": "CAUTION",
+      "synonyms": ["vitamina c efervescente", "cebion 1g", "vitamina c 1g", "vitamina c 2g", "megadose vitamina c"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Em megadoses (acima de 1g/dia ou intravenosa), o ácido ascórbico pode se comportar como pró-oxidante no plasma. Dosagens nutricionais normais de alimentos são seguras."
+    },
+    {
+      "id": "drug-ibuprofeno",
+      "name": "Ibuprofeno",
+      "category": "DRUG_ANALGESIC",
+      "riskLevel": "SAFE",
+      "synonyms": ["ibuprofeno", "alivium", "advil", "ibupril", "dalsy", "ibuprofen"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Opção antipirética e analgésica considerada mais segura para G6PD em dose terapêutica.",
+      "pediatricSyrupWarning": "Princípio ativo 100% seguro na G6PD. Contudo, suspensões e xaropes pediátricos (especialmente sabor morango/tutti-frutti) costumam conter corantes artificiais proibidos (Vermelho 40, Tartrazina ou Amarelo Crepúsculo). Dê preferência a formulações em gotas incolores ou sem corante."
+    },
+    {
+      "id": "drug-paracetamol",
+      "name": "Paracetamol (Acetaminofeno)",
+      "category": "DRUG_ANALGESIC",
+      "riskLevel": "SAFE",
+      "synonyms": ["paracetamol", "tylenol", "acetaminofeno", "acetaminophen"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Seguro estritamente em doses terapêuticas pediátricas corretas (superdosagens são perigosas).",
+      "pediatricSyrupWarning": "Princípio ativo seguro em dose habitual. Atenção redobrada aos excipientes de xaropes coloridos (frequentemente contêm Vermelho 40 ou Amarelo Crepúsculo). Opte por gotas incolores."
+    },
+    {
+      "id": "drug-amoxicilina",
+      "name": "Amoxicilina (inclusive com Clavulanato)",
+      "category": "DRUG_ANTIBIOTIC",
+      "riskLevel": "SAFE",
+      "synonyms": ["amoxicilina", "amoxil", "amoxicilina + clavulanato", "amoxicilina e clavulanato", "clavulin", "amoxicillin"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Antibiótico betalactâmico seguro para eritrócitos com G6PD.",
+      "pediatricSyrupWarning": "Princípio ativo seguro. Verifique a linha 'Excipientes' do pó para suspensão oral: prefira marcas incolores e sem corantes artificiais."
+    },
+    {
+      "id": "drug-cefalexina",
+      "name": "Cefalexina",
+      "category": "DRUG_ANTIBIOTIC",
+      "riskLevel": "SAFE",
+      "synonyms": ["cefalexina", "keflex", "cephalexin"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Cefalosporina segura na deficiência de G6PD.",
+      "pediatricSyrupWarning": "Princípio ativo seguro. Confira a presença de corantes em suspensões líquidas pediátricas."
+    },
+    {
+      "id": "drug-azitromicina",
+      "name": "Azitromicina",
+      "category": "DRUG_ANTIBIOTIC",
+      "riskLevel": "SAFE",
+      "synonyms": ["azitromicina", "astro", "zitromax", "azithromycin"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Macrolídeo seguro.",
+      "pediatricSyrupWarning": "Princípio ativo seguro. Verifique os excipientes da suspensão líquida."
+    },
+    {
+      "id": "drug-prednisolona",
+      "name": "Prednisolona / Prednisona",
+      "category": "DRUG_OTHER",
+      "riskLevel": "SAFE",
+      "synonyms": ["prednisolona", "predsim", "prelona", "prednisona", "prednisolone"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Corticoide seguro para eritrócitos na G6PD.",
+      "pediatricSyrupWarning": "Princípio ativo seguro. Xaropes pediátricos de predsim/prelona costumam ser incolores, mas sempre confira a bula."
+    },
+    {
+      "id": "drug-loratadina",
+      "name": "Loratadina / Desloratadina",
+      "category": "DRUG_OTHER",
+      "riskLevel": "SAFE",
+      "synonyms": ["loratadina", "claritin", "desloratadina", "desalex", "loratadine"],
+      "protocolSource": "GLOBAL_CPIC_WHO",
+      "clinicalMechanism": "Anti-histamínico de 2ª geração seguro na G6PD.",
+      "pediatricSyrupWarning": "Princípio ativo seguro. Verifique se o xarope não contém corantes azoicos."
+    }
+  ]
+}
