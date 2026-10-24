@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Barcode, Search, AlertOctagon, CheckCircle2, AlertTriangle, X, Camera, Plus, Loader2 } from 'lucide-react';
+import { Barcode, Search, X, Camera, Plus, Loader2 } from 'lucide-react';
 import { lookupProductByBarcode, ProductLookupResult } from '../services/openFoodFacts.ts';
 import { detectBarcodeFromImage } from '../services/imageOcr.ts';
 import { addPantryItem } from '../services/pantryStorage.ts';

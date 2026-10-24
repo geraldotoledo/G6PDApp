@@ -7,7 +7,6 @@ import {
   Download,
   Upload,
   Calendar,
-  Check,
   Search,
   ExternalLink
 } from 'lucide-react';
@@ -31,7 +30,6 @@ export const SafePantryScreen: React.FC<SafePantryScreenProps> = ({ onAnalyzePro
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [importJsonText, setImportJsonText] = useState('');
-  const [copiedNotification, setCopiedNotification] = useState('');
 
   // Formulário para novo item
   const [newName, setNewName] = useState('');

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { AlertCircle, Phone, Heart, Printer, Share2, Save, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { AlertCircle, Printer, Share2, Save, Check } from 'lucide-react';
 
 export const EmergencyCardScreen: React.FC = () => {
   // Carregar dados salvos no aparelho

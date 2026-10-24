@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Pill, AlertTriangle, ShieldCheck, AlertOctagon, Filter } from 'lucide-react';
+import { Search, Pill } from 'lucide-react';
 import { DEFAULT_G6PD_DATABASE } from '../data/defaultRules.ts';
-import { Category, G6PDRule, ProfileMode } from '../engine/types.ts';
+import { G6PDRule, ProfileMode } from '../engine/types.ts';
 import { normalizeText } from '../engine/normalizer.ts';
 
 interface DrugSearchScreenProps {

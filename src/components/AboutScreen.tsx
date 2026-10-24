@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, ExternalLink, ShieldCheck, Heart, Award } from 'lucide-react';
+import { BookOpen, ExternalLink, Award } from 'lucide-react';
 import { DEFAULT_G6PD_DATABASE } from '../data/defaultRules.ts';
 
 export const AboutScreen: React.FC = () => {

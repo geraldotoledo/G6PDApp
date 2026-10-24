@@ -24,17 +24,17 @@ export function normalizeText(rawText: string): string {
 
   // 3. Normalizar variações de códigos INS e E-numbers
   // Ex: "ins  102", "ins-102", "ins102", "ins. 102", "e-102", "e 102"
-  text = text.replace(/\bins[\s\.\-_]*([0-9]{3}[a-z]?|[0-9]{3}\s*(?:iv|iii|ii|i))\b/gi, (match, code) => {
+  text = text.replace(/\bins[\s\.\-_]*([0-9]{3}[a-z]?|[0-9]{3}\s*(?:iv|iii|ii|i))\b/gi, (_match, code) => {
     return `ins ${code.replace(/\s+/g, '')}`;
   });
 
-  text = text.replace(/\be[\s\.\-_]*([0-9]{3}[a-z]?)\b/gi, (match, code) => {
+  text = text.replace(/\be[\s\.\-_]*([0-9]{3}[a-z]?)\b/gi, (_match, code) => {
     return `e${code}`;
   });
 
   // 4. Correção de homóglifos ópticos em padrões de código INS
   // Ex: "ins 15o d" ou "ins 15od" -> "ins 150d"
-  text = text.replace(/\bins\s*([0-9oO]{3})\s*([a-ziv]+)?\b/gi, (match, num, suffix) => {
+  text = text.replace(/\bins\s*([0-9oO]{3})\s*([a-ziv]+)?\b/gi, (_match, num, suffix) => {
     const fixedNum = num.replace(/[oO]/g, '0');
     return `ins ${fixedNum}${suffix ? suffix.trim() : ''}`;
   });
