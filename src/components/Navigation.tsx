@@ -1,7 +1,7 @@
 import React from 'react';
-import { ScanText, Pill, AlertCircle, BookOpen } from 'lucide-react';
+import { ScanText, ShoppingBag, Pill, AlertCircle, BookOpen } from 'lucide-react';
 
-export type ActiveTab = 'SCANNER' | 'DRUGS' | 'EMERGENCY' | 'ABOUT';
+export type ActiveTab = 'SCANNER' | 'PANTRY' | 'DRUGS' | 'EMERGENCY' | 'ABOUT';
 
 interface NavigationProps {
   activeTab: ActiveTab;
@@ -10,10 +10,11 @@ interface NavigationProps {
 
 export const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
   const tabs = [
-    { id: 'SCANNER' as ActiveTab, label: 'Analisador', icon: ScanText },
-    { id: 'DRUGS' as ActiveTab, label: 'Remédios & INS', icon: Pill },
+    { id: 'SCANNER' as ActiveTab, label: 'Scanner', icon: ScanText },
+    { id: 'PANTRY' as ActiveTab, label: 'Despensa', icon: ShoppingBag },
+    { id: 'DRUGS' as ActiveTab, label: 'Remédios', icon: Pill },
     { id: 'EMERGENCY' as ActiveTab, label: 'Emergência', icon: AlertCircle },
-    { id: 'ABOUT' as ActiveTab, label: 'Diretrizes', icon: BookOpen }
+    { id: 'ABOUT' as ActiveTab, label: 'Sobre', icon: BookOpen }
   ];
 
   return (
@@ -27,7 +28,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }
             onClick={() => onTabChange(tab.id)}
             className={`nav-item ${isActive ? 'active' : ''}`}
           >
-            <Icon size={20} />
+            <Icon size={19} />
             <span>{tab.label}</span>
           </button>
         );

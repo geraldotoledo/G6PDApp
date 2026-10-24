@@ -4,6 +4,7 @@ import { DEFAULT_G6PD_DATABASE } from './data/defaultRules.ts';
 import { Header } from './components/Header.tsx';
 import { Navigation, ActiveTab } from './components/Navigation.tsx';
 import { ScannerScreen } from './components/ScannerScreen.tsx';
+import { SafePantryScreen } from './components/SafePantryScreen.tsx';
 import { DrugSearchScreen } from './components/DrugSearchScreen.tsx';
 import { EmergencyCardScreen } from './components/EmergencyCardScreen.tsx';
 import { AboutScreen } from './components/AboutScreen.tsx';
@@ -15,6 +16,7 @@ export const App: React.FC = () => {
     return (localStorage.getItem('g6pd_profile_mode') as ProfileMode) || 'BRAZIL_PEDIATRIC';
   });
 
+  const [pantrySelectedText, setPantrySelectedText] = useState<string>('');
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
@@ -29,6 +31,11 @@ export const App: React.FC = () => {
     localStorage.setItem('g6pd_profile_mode', mode);
   };
 
+  const handleAnalyzeFromPantry = (ingredients: string) => {
+    setPantrySelectedText(ingredients);
+    setActiveTab('SCANNER');
+  };
+
   return (
     <div className="app-container">
       <Header
@@ -38,10 +45,25 @@ export const App: React.FC = () => {
       />
 
       <main style={{ minHeight: 'calc(100vh - 200px)' }}>
-        {activeTab === 'SCANNER' && <ScannerScreen profileMode={profileMode} />}
-        {activeTab === 'DRUGS' && <DrugSearchScreen profileMode={profileMode} />}
-        {activeTab === 'EMERGENCY' && <EmergencyCardScreen />}
-        {activeTab === 'ABOUT' && <AboutScreen />}
+        {activeTab === 'SCANNER' && (
+          <ScannerScreen
+            profileMode={profileMode}
+            initialText={pantrySelectedText}
+            onClearInitialText={() => setPantrySelectedText('')}
+          />
+        )}
+        {activeTab === 'PANTRY' && (
+          <SafePantryScreen onAnalyzeProduct={handleAnalyzeFromPantry} />
+        )}
+        {activeTab === 'DRUGS' && (
+          <DrugSearchScreen profileMode={profileMode} />
+        )}
+        {activeTab === 'EMERGENCY' && (
+          <EmergencyCardScreen />
+        )}
+        {activeTab === 'ABOUT' && (
+          <AboutScreen />
+        )}
       </main>
 
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />

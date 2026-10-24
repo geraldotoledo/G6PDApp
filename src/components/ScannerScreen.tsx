@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AlertOctagon,
   AlertTriangle,
@@ -6,20 +6,42 @@ import {
   Sparkles,
   Search,
   RotateCcw,
-  BookOpen,
-  Info
+  Camera,
+  Barcode,
+  Plus,
+  Info,
+  Check
 } from 'lucide-react';
 import { AnalysisResult, ProfileMode } from '../engine/types.ts';
 import { analyzeIngredientsText } from '../engine/ruleEngine.ts';
 import { AiHandoffModal } from './AiHandoffModal.tsx';
+import { BarcodeScannerModal } from './BarcodeScannerModal.tsx';
+import { preprocessLabelImage } from '../services/imageOcr.ts';
+import { addPantryItem } from '../services/pantryStorage.ts';
 
 interface ScannerScreenProps {
   profileMode: ProfileMode;
+  initialText?: string;
+  onClearInitialText?: () => void;
 }
 
-export const ScannerScreen: React.FC<ScannerScreenProps> = ({ profileMode }) => {
-  const [inputText, setInputText] = useState('');
+export const ScannerScreen: React.FC<ScannerScreenProps> = ({
+  profileMode,
+  initialText = '',
+  onClearInitialText
+}) => {
+  const [inputText, setInputText] = useState(initialText);
   const [showAiModal, setShowAiModal] = useState(false);
+  const [showBarcodeModal, setShowBarcodeModal] = useState(false);
+  const [savedToPantry, setSavedToPantry] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialText) {
+      setInputText(initialText);
+      onClearInitialText?.();
+    }
+  }, [initialText, onClearInitialText]);
 
   // Amostras reais para teste rápido
   const sampleRealBiscuits = [
@@ -49,7 +71,34 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({ profileMode }) => 
     ? analyzeIngredientsText(inputText, { profileMode })
     : null;
 
-  // Função para renderizar o texto com destaque colorido nas palavras identificadas
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const processed = await preprocessLabelImage(file);
+      setPhotoPreview(processed.processedDataUrl);
+      // Sugere ao usuário conferir a foto ajustada
+    } catch (err) {
+      console.error('Falha no pré-processamento de imagem:', err);
+    }
+  };
+
+  const handleSaveToPantry = () => {
+    if (!inputText.trim()) return;
+
+    const firstLine = inputText.trim().split('\n')[0].substring(0, 40);
+    addPantryItem({
+      name: firstLine || 'Produto Validado',
+      brand: 'Marca conferida',
+      ingredients: inputText.trim(),
+      notes: 'Adicionado após veredito 100% verde no Scanner'
+    });
+
+    setSavedToPantry(true);
+    setTimeout(() => setSavedToPantry(false), 2500);
+  };
+
   const renderHighlightedText = () => {
     if (!analysis || !inputText) return null;
 
@@ -64,12 +113,10 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({ profileMode }) => 
     let lastIdx = 0;
 
     spans.forEach((span, index) => {
-      // Texto antes do span
       if (span.start > lastIdx) {
         elements.push(<span key={`text-${index}`}>{normalized.substring(lastIdx, span.start)}</span>);
       }
 
-      // Span com destaque
       let className = 'hl-yellow';
       if (span.type === 'RED') className = 'hl-red';
       if (span.type === 'SAFE_LOOKALIKE') className = 'hl-safe';
@@ -96,6 +143,58 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({ profileMode }) => 
 
   return (
     <div>
+      {/* Botões Rápidos de Captura (Código de Barras e Câmera de Rótulo) */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '14px' }}>
+        <button
+          className="btn btn-primary"
+          style={{ padding: '10px', fontSize: '0.82rem', background: 'linear-gradient(135deg, #0284c7, #38bdf8)' }}
+          onClick={() => setShowBarcodeModal(true)}
+        >
+          <Barcode size={18} />
+          Código de Barras (EAN)
+        </button>
+
+        <label
+          className="btn btn-secondary"
+          style={{ padding: '10px', fontSize: '0.82rem', cursor: 'pointer', textAlign: 'center' }}
+        >
+          <Camera size={18} />
+          Foto do Rótulo
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handlePhotoUpload}
+            style={{ display: 'none' }}
+          />
+        </label>
+      </div>
+
+      {/* Prévia da Imagem Otimizada */}
+      {photoPreview && (
+        <div className="card" style={{ padding: '12px', background: '#0b1120' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#38bdf8' }}>
+              Foto com Alto Contraste (Anti-Reflexo)
+            </span>
+            <button
+              onClick={() => setPhotoPreview(null)}
+              style={{ background: 'none', border: 'none', color: 'var(--text-dim)', fontSize: '0.75rem', cursor: 'pointer' }}
+            >
+              Fechar Prévia
+            </button>
+          </div>
+          <img
+            src={photoPreview}
+            alt="Rótulo pré-processado"
+            style={{ width: '100%', maxHeight: '180px', objectFit: 'contain', borderRadius: '8px', border: '1px solid var(--border-color)' }}
+          />
+          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+            Ajustamos o contraste para facilitar a leitura das letras miúdas. Digite ou cole o texto abaixo.
+          </div>
+        </div>
+      )}
+
       {/* Caixa de Entrada de Texto do Rótulo */}
       <div className="card">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -118,7 +217,7 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({ profileMode }) => 
         <textarea
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Cole aqui o texto do rótulo lido pela câmera, bula do medicamento ou lista de ingredientes..."
+          placeholder="Cole aqui o texto do rótulo, bula ou use o leitor de código de barras acima..."
           rows={4}
           style={{
             width: '100%',
@@ -229,7 +328,7 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({ profileMode }) => 
           )}
 
           {/* Botão de Destaque: Analisar a Fundo com Minha IA */}
-          <div style={{ marginBottom: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
             <button
               className="btn btn-ai"
               style={{ width: '100%', padding: '14px', fontSize: '0.98rem' }}
@@ -238,6 +337,18 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({ profileMode }) => 
               <Sparkles size={20} />
               ✨ Analisar a Fundo com Minha IA (Gemini, ChatGPT, Claude)
             </button>
+
+            {analysis.status === 'GREEN_SAFE' && (
+              <button
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '12px', background: '#10b981' }}
+                onClick={handleSaveToPantry}
+                disabled={savedToPantry}
+              >
+                {savedToPantry ? <Check size={18} /> : <Plus size={18} />}
+                {savedToPantry ? 'Salvo na Despensa da Família!' : 'Salvar este Alimento na Despensa Segura'}
+              </button>
+            )}
           </div>
 
           {/* Texto com Destaque Colorido */}
@@ -341,6 +452,17 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({ profileMode }) => 
         <AiHandoffModal
           analysis={analysis}
           onClose={() => setShowAiModal(false)}
+        />
+      )}
+
+      {/* Modal de Leitor de Código de Barras */}
+      {showBarcodeModal && (
+        <BarcodeScannerModal
+          profileMode={profileMode}
+          onClose={() => setShowBarcodeModal(false)}
+          onSelectIngredientsForScan={(text) => {
+            setInputText(text);
+          }}
         />
       )}
     </div>
