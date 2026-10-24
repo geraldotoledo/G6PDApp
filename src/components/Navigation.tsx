@@ -28,7 +28,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }
             onClick={() => onTabChange(tab.id)}
             className={`nav-item ${isActive ? 'active' : ''}`}
           >
-            <Icon size={19} />
+            <Icon size={18} />
             <span>{tab.label}</span>
           </button>
         );

@@ -256,38 +256,59 @@ select, input, textarea, button {
   font-weight: 600;
 }
 
-/* Barra de Navegação Inferior */
+/* Barra de Navegação Inferior (Mobile First - 5 abas perfeitamente distribuídas) */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: rgba(15, 23, 42, 0.95);
+  background-color: rgba(15, 23, 42, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid var(--border-color);
   display: flex;
-  justify-content: space-around;
-  padding: 8px 12px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 4px calc(env(safe-area-inset-bottom, 0px) + 6px) 4px;
   z-index: 50;
   max-width: 500px;
+  width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .nav-item {
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 3px;
   background: none;
   border: none;
   color: var(--text-dim);
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 10px;
+  padding: 6px 2px;
+  border-radius: 8px;
   transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.nav-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.nav-item svg {
+  flex-shrink: 0;
 }
 
 .nav-item.active {
