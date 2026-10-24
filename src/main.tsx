@@ -6,7 +6,7 @@ import './index.css';
 // Registrar Service Worker para PWA Offline
 if ('serviceWorker' in navigator && !import.meta.env.DEV) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((err) => {
+    navigator.serviceWorker.register('./sw.js').catch((err) => {
       console.warn('Registro do Service Worker falhou:', err);
     });
   });

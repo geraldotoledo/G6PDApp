@@ -7,7 +7,7 @@ import {
   TextHighlightSpan,
   VerdictStatus
 } from './types.ts';
-import { DEFAULT_G6PD_DATABASE } from '../data/defaultRules.ts';
+import { getActiveRulesDatabase } from '../services/rulesSync.ts';
 import { normalizeText } from './normalizer.ts';
 import { evaluateLabelCompleteness } from './completenessGate.ts';
 
@@ -35,7 +35,7 @@ function escapeRegex(str: string): string {
  * Motor de Regras Determinístico do G6PDApp
  */
 export function analyzeIngredientsText(rawText: string, options?: AnalyzeOptions): AnalysisResult {
-  const database = options?.database || DEFAULT_G6PD_DATABASE;
+  const database = options?.database || getActiveRulesDatabase();
   const profileMode: ProfileMode = options?.profileMode || 'BRAZIL_PEDIATRIC';
   const isSearchQuery = !!options?.isSearchQuery;
 
@@ -74,7 +74,18 @@ export function analyzeIngredientsText(rawText: string, options?: AnalyzeOptions
   // 2. Cruzar com as Regras da Base G6PD
   // -----------------------------------------------------------
   const matches: RuleMatch[] = [];
+  const rawSpans: TextHighlightSpan[] = [];
   const pediatricSyrupAlerts: string[] = [];
+
+  for (const safe of safeSpans) {
+    rawSpans.push({
+      start: safe.start,
+      end: safe.end,
+      text: safe.term,
+      type: 'SAFE_LOOKALIKE',
+      message: 'Nutriente/Substância Segura (não confundir com sulfitos/corantes)'
+    });
+  }
 
   for (const rule of database.rules) {
     // Determinar risco efetivo conforme o perfil selecionado
@@ -126,13 +137,32 @@ export function analyzeIngredientsText(rawText: string, options?: AnalyzeOptions
           continue;
         }
 
-        matches.push({
-          rule,
-          matchedTerm: normalized.substring(start, end),
-          startIdx: start,
-          endIdx: end,
-          effectiveRisk
+        const matchedTermStr = normalized.substring(start, end);
+        const isRed = effectiveRisk === 'HIGH_RISK' || effectiveRisk === 'RESTRICTED_BR';
+
+        rawSpans.push({
+          start,
+          end,
+          text: matchedTermStr,
+          type: isRed ? 'RED' : 'YELLOW',
+          ruleName: rule.name,
+          message: rule.clinicalMechanism
         });
+
+        const existing = matches.find(m => m.rule.id === rule.id);
+        if (!existing) {
+          matches.push({
+            rule,
+            matchedTerm: matchedTermStr,
+            startIdx: start,
+            endIdx: end,
+            effectiveRisk
+          });
+        } else {
+          if (!existing.matchedTerm.includes(matchedTermStr)) {
+            existing.matchedTerm += `, ${matchedTermStr}`;
+          }
+        }
         ruleMatched = true;
       }
     }
@@ -144,34 +174,33 @@ export function analyzeIngredientsText(rawText: string, options?: AnalyzeOptions
   }
 
   // -----------------------------------------------------------
-  // 3. Montar Destaques Visuais (Highlight Spans)
+  // 3. Montar Destaques Visuais (Highlight Spans) & Fundir Sobreposições
   // -----------------------------------------------------------
+  // Ordenar por início crescente e, em caso de empate, pelo maior comprimento primeiro
+  rawSpans.sort((a, b) => a.start - b.start || (b.end - b.start) - (a.end - a.start));
+
   const highlightSpans: TextHighlightSpan[] = [];
-
-  for (const safe of safeSpans) {
-    highlightSpans.push({
-      start: safe.start,
-      end: safe.end,
-      text: safe.term,
-      type: 'SAFE_LOOKALIKE',
-      message: 'Nutriente/Substância Segura (não confundir com sulfitos/corantes)'
-    });
+  for (const span of rawSpans) {
+    if (highlightSpans.length === 0) {
+      highlightSpans.push({ ...span });
+      continue;
+    }
+    const prev = highlightSpans[highlightSpans.length - 1];
+    if (span.start < prev.end) {
+      // Há sobreposição: expandir o fim se necessário e manter a maior severidade (RED > YELLOW > SAFE_LOOKALIKE)
+      if (span.end > prev.end) {
+        prev.end = span.end;
+        prev.text = normalized.substring(prev.start, prev.end);
+      }
+      if (span.type === 'RED' || (span.type === 'YELLOW' && prev.type === 'SAFE_LOOKALIKE')) {
+        prev.type = span.type;
+        prev.ruleName = span.ruleName || prev.ruleName;
+        prev.message = span.message || prev.message;
+      }
+    } else {
+      highlightSpans.push({ ...span });
+    }
   }
-
-  for (const m of matches) {
-    const isRed = m.effectiveRisk === 'HIGH_RISK' || m.effectiveRisk === 'RESTRICTED_BR';
-    highlightSpans.push({
-      start: m.startIdx,
-      end: m.endIdx,
-      text: m.matchedTerm,
-      type: isRed ? 'RED' : 'YELLOW',
-      ruleName: m.rule.name,
-      message: m.rule.clinicalMechanism
-    });
-  }
-
-  // Ordenar spans por posição no texto
-  highlightSpans.sort((a, b) => a.start - b.start);
 
   // -----------------------------------------------------------
   // 4. Determinar Veredito Final (Semáforo)

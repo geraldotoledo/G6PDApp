@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   AlertOctagon,
   AlertTriangle,
@@ -19,7 +19,7 @@ import { AnalysisResult, ProfileMode } from '../engine/types.ts';
 import { analyzeIngredientsText } from '../engine/ruleEngine.ts';
 import { AiHandoffModal } from './AiHandoffModal.tsx';
 import { BarcodeScannerModal } from './BarcodeScannerModal.tsx';
-import { preprocessLabelImage } from '../services/imageOcr.ts';
+import { preprocessLabelImage, extractTextFromPreprocessedImage } from '../services/imageOcr.ts';
 import { addPantryItem } from '../services/pantryStorage.ts';
 import {
   startVoiceListening,
@@ -43,7 +43,13 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({
   const [showAiModal, setShowAiModal] = useState(false);
   const [showBarcodeModal, setShowBarcodeModal] = useState(false);
   const [savedToPantry, setSavedToPantry] = useState(false);
+  const [showSavePantryForm, setShowSavePantryForm] = useState(false);
+  const [pantryProductName, setPantryProductName] = useState('');
+  const [pantryProductBrand, setPantryProductBrand] = useState('');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isOcrProcessing, setIsOcrProcessing] = useState(false);
+  const [ocrProgress, setOcrProgress] = useState(0);
+  const [ocrError, setOcrError] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [voiceStopFn, setVoiceStopFn] = useState<(() => void) | null>(null);
 
@@ -105,35 +111,62 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({
     }
   ];
 
-  const analysis: AnalysisResult | null = inputText.trim()
-    ? analyzeIngredientsText(inputText, { profileMode })
-    : null;
+  const analysis: AnalysisResult | null = useMemo(() => {
+    return inputText.trim()
+      ? analyzeIngredientsText(inputText, { profileMode })
+      : null;
+  }, [inputText, profileMode]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
+      setIsOcrProcessing(true);
+      setOcrProgress(10);
+      setOcrError(null);
+
       const processed = await preprocessLabelImage(file);
       setPhotoPreview(processed.processedDataUrl);
-      // Sugere ao usuário conferir a foto ajustada
+      setOcrProgress(25);
+
+      const extractedText = await extractTextFromPreprocessedImage(
+        processed.processedDataUrl,
+        (progress) => setOcrProgress(25 + Math.round(progress * 0.75))
+      );
+
+      if (extractedText && extractedText.trim()) {
+        setInputText(extractedText.trim());
+      } else {
+        setOcrError('Nenhum texto legível foi detectado na foto. Tente aproximar da lista de ingredientes ou digite o texto.');
+      }
     } catch (err) {
-      console.error('Falha no pré-processamento de imagem:', err);
+      console.error('Falha no pré-processamento/OCR da imagem:', err);
+      setOcrError('Não foi possível ler o texto automaticamente. Você pode digitar ou colar os ingredientes abaixo.');
+    } finally {
+      setIsOcrProcessing(false);
+      e.target.value = '';
     }
   };
 
   const handleSaveToPantry = () => {
     if (!inputText.trim()) return;
 
-    const firstLine = inputText.trim().split('\n')[0].substring(0, 40);
+    const fallbackName = inputText.trim().split('\n')[0].substring(0, 40);
+    const finalName = pantryProductName.trim() || fallbackName || 'Produto Validado';
+    const finalBrand = pantryProductBrand.trim() || 'Marca conferida';
+
     addPantryItem({
-      name: firstLine || 'Produto Validado',
-      brand: 'Marca conferida',
+      name: finalName,
+      brand: finalBrand,
       ingredients: inputText.trim(),
       notes: 'Adicionado após veredito 100% verde no Scanner'
     });
 
     setSavedToPantry(true);
+    setShowSavePantryForm(false);
+    setPantryProductName('');
+    setPantryProductBrand('');
     setTimeout(() => setSavedToPantry(false), 2500);
   };
 
@@ -169,7 +202,7 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({
         </mark>
       );
 
-      lastIdx = span.end;
+      lastIdx = Math.max(lastIdx, span.end);
     });
 
     if (lastIdx < normalized.length) {
@@ -230,6 +263,48 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({
           <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '6px' }}>
             Ajustamos o contraste para facilitar a leitura das letras miúdas. Digite ou cole o texto abaixo.
           </div>
+        </div>
+      )}
+
+      {/* Indicador de Processamento OCR */}
+      {isOcrProcessing && (
+        <div style={{
+          background: 'rgba(56, 189, 248, 0.1)',
+          border: '1px solid rgba(56, 189, 248, 0.3)',
+          borderRadius: '8px',
+          padding: '10px 14px',
+          marginBottom: '14px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          fontSize: '0.85rem',
+          color: '#38bdf8'
+        }}>
+          <div style={{
+            width: '14px',
+            height: '14px',
+            border: '2px solid #38bdf8',
+            borderTopColor: 'transparent',
+            borderRadius: '50%',
+            display: 'inline-block',
+            animation: 'spin 1s linear infinite'
+          }} />
+          <span>🔍 Lendo ingredientes da foto... {ocrProgress}%</span>
+        </div>
+      )}
+
+      {/* Alerta de Falha/Aviso de OCR */}
+      {ocrError && (
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.1)',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          borderRadius: '8px',
+          padding: '10px 14px',
+          marginBottom: '14px',
+          fontSize: '0.82rem',
+          color: '#f87171'
+        }}>
+          {ocrError}
         </div>
       )}
 
@@ -403,15 +478,76 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({
             </button>
 
             {analysis.status === 'GREEN_SAFE' && (
-              <button
-                className="btn btn-primary"
-                style={{ width: '100%', padding: '12px', background: '#10b981' }}
-                onClick={handleSaveToPantry}
-                disabled={savedToPantry}
-              >
-                {savedToPantry ? <Check size={18} /> : <Plus size={18} />}
-                {savedToPantry ? 'Salvo na Despensa da Família!' : 'Salvar este Alimento na Despensa Segura'}
-              </button>
+              <div style={{ width: '100%' }}>
+                {!showSavePantryForm ? (
+                  <button
+                    className="btn btn-primary"
+                    style={{ width: '100%', padding: '12px', background: '#10b981' }}
+                    onClick={() => setShowSavePantryForm(true)}
+                    disabled={savedToPantry}
+                  >
+                    {savedToPantry ? <Check size={18} /> : <Plus size={18} />}
+                    {savedToPantry ? 'Salvo na Despensa da Família!' : 'Salvar este Alimento na Despensa Segura'}
+                  </button>
+                ) : (
+                  <div style={{
+                    background: 'rgba(16, 185, 129, 0.08)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    textAlign: 'left'
+                  }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#10b981' }}>
+                      Identificação para a Despensa Segura
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>
+                        Nome do Alimento / Produto:
+                      </label>
+                      <input
+                        type="text"
+                        className="input-field"
+                        placeholder="Ex.: Biscoito Maria, Pão de Forma..."
+                        value={pantryProductName}
+                        onChange={(e) => setPantryProductName(e.target.value)}
+                        style={{ width: '100%', padding: '8px', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>
+                        Marca do Fabricante:
+                      </label>
+                      <input
+                        type="text"
+                        className="input-field"
+                        placeholder="Ex.: Bauducco, Wickbold..."
+                        value={pantryProductBrand}
+                        onChange={(e) => setPantryProductBrand(e.target.value)}
+                        style={{ width: '100%', padding: '8px', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                      <button
+                        className="btn btn-primary"
+                        style={{ flex: 1, padding: '10px', background: '#10b981' }}
+                        onClick={handleSaveToPantry}
+                      >
+                        <Check size={16} /> Confirmar e Salvar
+                      </button>
+                      <button
+                        className="btn btn-secondary"
+                        style={{ padding: '10px 14px' }}
+                        onClick={() => setShowSavePantryForm(false)}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 

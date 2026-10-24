@@ -157,4 +157,25 @@ describe('G6PDApp Rule Engine & Safety Invariants', () => {
     assert.ok(result.matches.some(m => m.rule.id === 'dye-caramelo-iv-150d'));
   });
 
+  it('14. Deduplicação e Fusão de Spans: "corante caramelo IV (INS 150d)" não deve duplicar cards da mesma regra nem gerar spans sobrepostos', () => {
+    const rawLabel = `
+      Ingredientes: Farinha de trigo, açúcar, extrato de malte, corante caramelo IV (INS 150d), sal e fermento.
+      ALÉRGICOS: CONTÉM GLÚTEN.
+    `;
+    const result = analyzeIngredientsText(rawLabel);
+
+    assert.strictEqual(result.status, 'RED_BLOCKED');
+    const matchesCaramel = result.matches.filter(m => m.rule.id === 'dye-caramelo-iv-150d');
+    assert.strictEqual(matchesCaramel.length, 1);
+
+    for (let i = 0; i < result.highlightSpans.length - 1; i++) {
+      const current = result.highlightSpans[i];
+      const next = result.highlightSpans[i + 1];
+      assert.ok(
+        current.end <= next.start,
+        `Span sobreposto detectado: [${current.start}, ${current.end}] sobrepõe [${next.start}, ${next.end}]`
+      );
+    }
+  });
+
 });

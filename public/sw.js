@@ -1,10 +1,10 @@
-const CACHE_NAME = 'g6pd-app-cache-v1';
+const CACHE_NAME = 'g6pd-app-cache-v2';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/icon.svg',
-  '/g6pd_rules.json'
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './icon.svg',
+  './g6pd_rules.json'
 ];
 
 self.addEventListener('install', (event) => {

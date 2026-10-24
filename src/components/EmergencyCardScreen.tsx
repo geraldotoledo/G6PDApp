@@ -119,25 +119,26 @@ _Gerado via G6PDApp • Base Oficial CPIC & Sociedade Brasileira de Pediatria (S
             Dados da Criança (Salvos no Aparelho)
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '8px', marginBottom: '8px' }}>
-            <div>
-              <label style={{ fontSize: '0.72rem', color: 'var(--text-dim)', display: 'block', marginBottom: '2px' }}>Nome da Criança</label>
-              <input
-                type="text"
-                value={childName}
-                onChange={(e) => setChildName(e.target.value)}
-                placeholder="Nome completo..."
-                style={{
-                  width: '100%',
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '6px',
-                  color: 'white',
-                  padding: '6px 8px',
-                  fontSize: '0.85rem'
-                }}
-              />
-            </div>
+          <div style={{ marginBottom: '8px' }}>
+            <label style={{ fontSize: '0.72rem', color: 'var(--text-dim)', display: 'block', marginBottom: '2px' }}>Nome da Criança</label>
+            <input
+              type="text"
+              value={childName}
+              onChange={(e) => setChildName(e.target.value)}
+              placeholder="Nome completo..."
+              style={{
+                width: '100%',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '6px',
+                color: 'var(--text-main)',
+                padding: '6px 8px',
+                fontSize: '0.85rem'
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
             <div>
               <label style={{ fontSize: '0.72rem', color: 'var(--text-dim)', display: 'block', marginBottom: '2px' }}>Peso Atual (kg)</label>
               <input
@@ -150,7 +151,7 @@ _Gerado via G6PDApp • Base Oficial CPIC & Sociedade Brasileira de Pediatria (S
                   background: 'var(--bg-card)',
                   border: '1px solid var(--border-color)',
                   borderRadius: '6px',
-                  color: 'white',
+                  color: 'var(--text-main)',
                   padding: '6px 8px',
                   fontSize: '0.85rem'
                 }}
@@ -168,7 +169,7 @@ _Gerado via G6PDApp • Base Oficial CPIC & Sociedade Brasileira de Pediatria (S
                   background: 'var(--bg-card)',
                   border: '1px solid var(--border-color)',
                   borderRadius: '6px',
-                  color: 'white',
+                  color: 'var(--text-main)',
                   padding: '6px 8px',
                   fontSize: '0.85rem'
                 }}
@@ -189,7 +190,7 @@ _Gerado via G6PDApp • Base Oficial CPIC & Sociedade Brasileira de Pediatria (S
                   background: 'var(--bg-card)',
                   border: '1px solid var(--border-color)',
                   borderRadius: '6px',
-                  color: 'white',
+                  color: 'var(--text-main)',
                   padding: '6px 8px',
                   fontSize: '0.85rem'
                 }}
@@ -207,7 +208,7 @@ _Gerado via G6PDApp • Base Oficial CPIC & Sociedade Brasileira de Pediatria (S
                   background: 'var(--bg-card)',
                   border: '1px solid var(--border-color)',
                   borderRadius: '6px',
-                  color: 'white',
+                  color: 'var(--text-main)',
                   padding: '6px 8px',
                   fontSize: '0.85rem'
                 }}

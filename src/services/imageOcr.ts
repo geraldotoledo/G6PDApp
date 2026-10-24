@@ -111,3 +111,33 @@ export async function detectBarcodeFromImage(file: File): Promise<string | null>
 
   return null;
 }
+
+/**
+ * Extrai texto óptico (OCR) da imagem pré-processada sob demanda em Português.
+ * Utiliza carregamento dinâmico para manter o bundle principal leve.
+ */
+export async function extractTextFromPreprocessedImage(
+  dataUrl: string,
+  onProgress?: (progressPct: number) => void
+): Promise<string> {
+  try {
+    const { createWorker } = await import('tesseract.js');
+    const worker = await createWorker('por', 1, {
+      logger: (m) => {
+        if (m.status === 'recognizing text' && typeof m.progress === 'number') {
+          onProgress?.(Math.round(m.progress * 100));
+        }
+      }
+    });
+
+    try {
+      const { data } = await worker.recognize(dataUrl);
+      return data?.text || '';
+    } finally {
+      await worker.terminate();
+    }
+  } catch (err) {
+    console.warn('Falha no motor OCR Tesseract:', err);
+    throw err;
+  }
+}

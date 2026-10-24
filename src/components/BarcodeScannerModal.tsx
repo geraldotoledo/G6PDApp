@@ -21,6 +21,8 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
   const [result, setResult] = useState<ProductLookupResult | null>(null);
   const [savedToPantry, setSavedToPantry] = useState(false);
 
+  const isNativeBarcodeSupported = typeof window !== 'undefined' && 'BarcodeDetector' in window;
+
   const sampleEans = [
     { label: 'Biscoito Piraquê (Real)', ean: '7891000368945' },
     { label: 'Biscoito Maltado (Real)', ean: '7896024761460' }
@@ -108,6 +110,8 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <input
             type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             value={barcodeInput}
             onChange={(e) => setBarcodeInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -117,7 +121,7 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
               background: 'var(--bg-primary)',
               border: '1px solid var(--border-color)',
               borderRadius: '10px',
-              color: 'white',
+              color: 'var(--text-main)',
               padding: '10px 12px',
               fontSize: '0.9rem',
               fontFamily: 'var(--font-mono)'
@@ -148,6 +152,22 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
             style={{ display: 'none' }}
           />
         </label>
+
+        {!isNativeBarcodeSupported && (
+          <div style={{
+            fontSize: '0.72rem',
+            color: 'var(--text-muted)',
+            marginBottom: '14px',
+            background: 'var(--bg-card-subtle)',
+            padding: '8px 10px',
+            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            <span>💡 Dica: Digite os 13 números do código de barras diretamente ou envie uma foto nítida.</span>
+          </div>
+        )}
 
         {/* Amostras rápidas de EAN */}
         <div style={{ marginBottom: '16px' }}>

@@ -6,7 +6,7 @@ const LAST_CHECK_KEY = 'g6pd_rules_last_sync_check';
 
 // URL padrão no GitHub Pages (custo R$ 0,00)
 export const DEFAULT_REMOTE_RULES_URL =
-  'https://geraldo-toledo.github.io/G6PDApp/g6pd_rules.json';
+  'https://geraldotoledo.github.io/G6PDApp/g6pd_rules.json';
 
 export interface SyncCheckResult {
   updated: boolean;
@@ -18,18 +18,38 @@ export interface SyncCheckResult {
 }
 
 /**
+ * Compara duas versões no formato YYYY.MM.DD ou SemVer numericamente
+ * Retorna > 0 se vA > vB, < 0 se vA < vB, e 0 se iguais.
+ */
+export function compareRulesVersion(vA: string, vB: string): number {
+  const partsA = vA.replace(/^v/i, '').split('.').map(Number);
+  const partsB = vB.replace(/^v/i, '').split('.').map(Number);
+  const len = Math.max(partsA.length, partsB.length);
+  for (let i = 0; i < len; i++) {
+    const a = partsA[i] || 0;
+    const b = partsB[i] || 0;
+    if (a > b) return 1;
+    if (a < b) return -1;
+  }
+  return 0;
+}
+
+/**
  * Retorna a base de regras ativa (usando a versão atualizada pela nuvem,
  * ou o fallback embutido de fábrica se offline ou primeira execução).
  */
 export function getActiveRulesDatabase(): G6PDRulesDatabase {
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    return DEFAULT_G6PD_DATABASE;
+  }
   try {
     const stored = localStorage.getItem(DYNAMIC_RULES_STORAGE_KEY);
     if (stored) {
       const parsed: G6PDRulesDatabase = JSON.parse(stored);
       // Validar integridade mínima
       if (isValidRulesDatabase(parsed)) {
-        // Usar a que tiver versão mais recente
-        if (parsed.rulesVersion >= DEFAULT_G6PD_DATABASE.rulesVersion) {
+        // Usar a que tiver versão mais recente numericamente
+        if (compareRulesVersion(parsed.rulesVersion, DEFAULT_G6PD_DATABASE.rulesVersion) >= 0) {
           return parsed;
         }
       }
@@ -104,8 +124,8 @@ export async function syncRulesFromRemote(
 
     localStorage.setItem(LAST_CHECK_KEY, new Date().toISOString());
 
-    // Comparar versão
-    if (json.rulesVersion > currentDb.rulesVersion) {
+    // Comparar versão numericamente
+    if (compareRulesVersion(json.rulesVersion, currentDb.rulesVersion) > 0) {
       localStorage.setItem(DYNAMIC_RULES_STORAGE_KEY, JSON.stringify(json));
       return {
         updated: true,

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Pill } from 'lucide-react';
-import { DEFAULT_G6PD_DATABASE } from '../data/defaultRules.ts';
 import { G6PDRule, ProfileMode } from '../engine/types.ts';
+import { getActiveRulesDatabase } from '../services/rulesSync.ts';
 import { normalizeText } from '../engine/normalizer.ts';
 
 interface DrugSearchScreenProps {
@@ -24,7 +24,7 @@ export const DrugSearchScreen: React.FC<DrugSearchScreenProps> = ({ profileMode 
   const filteredRules = useMemo(() => {
     const qNorm = normalizeText(query);
 
-    return DEFAULT_G6PD_DATABASE.rules.filter((rule: G6PDRule) => {
+    return getActiveRulesDatabase().rules.filter((rule: G6PDRule) => {
       // Filtro de categoria
       if (selectedCategory === 'DRUG' && !rule.category.startsWith('DRUG_')) return false;
       if (selectedCategory === 'DYE' && !rule.category.startsWith('DYE_')) return false;
@@ -110,6 +110,8 @@ export const DrugSearchScreen: React.FC<DrugSearchScreenProps> = ({ profileMode 
           let effectiveRisk = rule.riskLevel;
           if (profileMode === 'GLOBAL_CPIC' && rule.protocolSource === 'BRAZIL_SBP_APAE') {
             effectiveRisk = 'CAUTION';
+          } else if (profileMode === 'STRICT_ZERO_DYES' && rule.category === 'DYE_NATURAL') {
+            effectiveRisk = 'RESTRICTED_BR';
           }
 
           const isRed = effectiveRisk === 'HIGH_RISK' || effectiveRisk === 'RESTRICTED_BR';
