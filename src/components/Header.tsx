@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldAlert, RefreshCw, Settings2, Check, AlertCircle } from 'lucide-react';
+import { RefreshCw, Settings2, Check, AlertCircle } from 'lucide-react';
 import { ProfileMode } from '../engine/types.ts';
 import { syncRulesFromRemote, SyncCheckResult } from '../services/rulesSync.ts';
 
@@ -37,14 +37,11 @@ export const Header: React.FC<HeaderProps> = ({
             width: '38px',
             height: '38px',
             borderRadius: '10px',
-            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4)',
+            overflow: 'hidden',
+            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.35)',
             flexShrink: 0
           }}>
-            <ShieldAlert size={22} color="#ffffff" />
+            <img src="./icon.svg" alt="G6PDApp" style={{ width: '100%', height: '100%', display: 'block' }} />
           </div>
           <div style={{ minWidth: 0, overflow: 'hidden' }}>
             <h1 style={{ fontSize: '1.15rem', fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '6px' }}>
