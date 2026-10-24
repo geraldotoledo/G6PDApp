@@ -10,7 +10,10 @@ import {
   Barcode,
   Plus,
   Info,
-  Check
+  Check,
+  Mic,
+  MicOff,
+  Volume2
 } from 'lucide-react';
 import { AnalysisResult, ProfileMode } from '../engine/types.ts';
 import { analyzeIngredientsText } from '../engine/ruleEngine.ts';
@@ -18,6 +21,12 @@ import { AiHandoffModal } from './AiHandoffModal.tsx';
 import { BarcodeScannerModal } from './BarcodeScannerModal.tsx';
 import { preprocessLabelImage } from '../services/imageOcr.ts';
 import { addPantryItem } from '../services/pantryStorage.ts';
+import {
+  startVoiceListening,
+  speakVerdict,
+  isVoiceRecognitionSupported,
+  isSpeechSynthesisSupported
+} from '../services/voiceAssistant.ts';
 
 interface ScannerScreenProps {
   profileMode: ProfileMode;
@@ -35,6 +44,35 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({
   const [showBarcodeModal, setShowBarcodeModal] = useState(false);
   const [savedToPantry, setSavedToPantry] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceStopFn, setVoiceStopFn] = useState<(() => void) | null>(null);
+
+  const handleToggleVoice = () => {
+    if (isListening) {
+      voiceStopFn?.();
+      setIsListening(false);
+      setVoiceStopFn(null);
+    } else {
+      setIsListening(true);
+      const stop = startVoiceListening(
+        (transcript) => {
+          setInputText(transcript);
+          setIsListening(false);
+          setVoiceStopFn(null);
+        },
+        (err) => {
+          alert(err);
+          setIsListening(false);
+          setVoiceStopFn(null);
+        },
+        () => {
+          setIsListening(false);
+          setVoiceStopFn(null);
+        }
+      );
+      setVoiceStopFn(() => stop);
+    }
+  };
 
   useEffect(() => {
     if (initialText) {
@@ -202,16 +240,29 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({
             <Search size={16} />
             Texto do Rótulo ou Bula
           </label>
-          {inputText && (
-            <button
-              onClick={() => setInputText('')}
-              className="btn btn-secondary"
-              style={{ padding: '4px 8px', fontSize: '0.75rem', borderRadius: '6px' }}
-            >
-              <RotateCcw size={12} />
-              Limpar
-            </button>
-          )}
+          <div style={{ display: 'flex', gap: '6px' }}>
+            {isVoiceRecognitionSupported() && (
+              <button
+                onClick={handleToggleVoice}
+                className="btn btn-secondary"
+                style={{ padding: '4px 8px', fontSize: '0.75rem', borderRadius: '6px', background: isListening ? '#ef4444' : undefined }}
+                title="Ditar pergunta ou ingredientes por voz"
+              >
+                {isListening ? <MicOff size={14} color="white" /> : <Mic size={14} />}
+                <span>{isListening ? 'Ouvindo...' : 'Falar'}</span>
+              </button>
+            )}
+            {inputText && (
+              <button
+                onClick={() => setInputText('')}
+                className="btn btn-secondary"
+                style={{ padding: '4px 8px', fontSize: '0.75rem', borderRadius: '6px' }}
+              >
+                <RotateCcw size={12} />
+                Limpar
+              </button>
+            )}
+          </div>
         </div>
 
         <textarea
@@ -285,12 +336,25 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({
                 </div>
               </div>
 
-              <span className={`badge ${
-                analysis.status === 'RED_BLOCKED' ? 'badge-red' :
-                analysis.status === 'YELLOW_ATTENTION' || analysis.status === 'YELLOW_INCOMPLETE_SCAN' ? 'badge-yellow' : 'badge-green'
-              }`}>
-                {analysis.statusBadge}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {isSpeechSynthesisSupported() && (
+                  <button
+                    onClick={() => speakVerdict(`${analysis.statusTitle}. ${analysis.summary}`)}
+                    className="btn btn-secondary no-print"
+                    style={{ padding: '6px 10px', fontSize: '0.75rem', borderRadius: '8px' }}
+                    title="Ouvir veredito em voz alta"
+                  >
+                    <Volume2 size={16} />
+                    <span className="no-print">Ouvir</span>
+                  </button>
+                )}
+                <span className={`badge ${
+                  analysis.status === 'RED_BLOCKED' ? 'badge-red' :
+                  analysis.status === 'YELLOW_ATTENTION' || analysis.status === 'YELLOW_INCOMPLETE_SCAN' ? 'badge-yellow' : 'badge-green'
+                }`}>
+                  {analysis.statusBadge}
+                </span>
+              </div>
             </div>
           </div>
 

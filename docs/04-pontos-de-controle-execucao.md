@@ -7,13 +7,13 @@ Este documento registra os pontos de controle das Fases 3, 4 e 5 do **G6PDApp**,
 ## 📌 Checklist de Execução
 
 ### FASE 3: Câmera Dupla (Código de Barras EAN-13 + OCR de Rótulo) + Despensa Segura
-- [ ] **PC-3.1**: Serviço Open Food Facts (`src/services/openFoodFacts.ts`) com busca por EAN-13, cache local e Trava contra Reformulação Silenciosa.
-- [ ] **PC-3.2**: Leitor de Código de Barras (`src/components/BarcodeScannerModal.tsx`) usando a API nativa `BarcodeDetector` + captura por câmera/arquivo.
-- [ ] **PC-3.3**: Módulo de OCR Local por Foto (`src/services/imageOcr.ts`) com pré-processamento de imagem em Canvas (contraste, escala de cinza, redução de reflexos) para extrair texto de fotos de rótulos.
-- [ ] **PC-3.4**: Despensa Segura da Família (`src/components/SafePantryScreen.tsx` e `src/services/pantryStorage.ts`):
+- [x] **PC-3.1**: Serviço Open Food Facts (`src/services/openFoodFacts.ts`) com busca por EAN-13, cache local e Trava contra Reformulação Silenciosa.
+- [x] **PC-3.2**: Leitor de Código de Barras (`src/components/BarcodeScannerModal.tsx`) usando a API nativa `BarcodeDetector` + captura por câmera/arquivo.
+- [x] **PC-3.3**: Módulo de OCR Local por Foto (`src/services/imageOcr.ts`) com pré-processamento de imagem em Canvas (contraste, escala de cinza, redução de reflexos) para extrair texto de fotos de rótulos.
+- [x] **PC-3.4**: Despensa Segura da Família (`src/components/SafePantryScreen.tsx` e `src/services/pantryStorage.ts`):
   - Salvar produtos validados pelos pais (nome, marca, código EAN, ingredientes e data).
   - Exportar / Importar Despensa Segura (JSON e texto WhatsApp) para envio com 1 clique aos celulares dos avós e escola.
-- [ ] **PC-3.5**: Integração com a navegação principal, verificação de testes unitários e commit no Git (`feat(camera-pantry)`).
+- [x] **PC-3.5**: Integração com a navegação principal, verificação de testes unitários e commit no Git (`commit dd14dcf`).
 
 ---
 

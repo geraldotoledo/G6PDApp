@@ -1,6 +1,7 @@
-import React from 'react';
-import { ShieldAlert, Info, Settings2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldAlert, RefreshCw, Settings2, Check, AlertCircle } from 'lucide-react';
 import { ProfileMode } from '../engine/types.ts';
+import { syncRulesFromRemote, SyncCheckResult } from '../services/rulesSync.ts';
 
 interface HeaderProps {
   profileMode: ProfileMode;
@@ -13,6 +14,21 @@ export const Header: React.FC<HeaderProps> = ({
   onProfileModeChange,
   rulesVersion
 }) => {
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<SyncCheckResult | null>(null);
+
+  const handleSync = async () => {
+    setSyncing(true);
+    setSyncResult(null);
+    try {
+      const res = await syncRulesFromRemote();
+      setSyncResult(res);
+      setTimeout(() => setSyncResult(null), 5000);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <header className="card" style={{ marginBottom: '16px', background: 'linear-gradient(180deg, #162035, #0f172a)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
@@ -39,7 +55,38 @@ export const Header: React.FC<HeaderProps> = ({
             </p>
           </div>
         </div>
+
+        {/* Botão de Sincronização de Regras */}
+        <button
+          onClick={handleSync}
+          disabled={syncing}
+          className="btn btn-secondary"
+          style={{ padding: '8px 10px', fontSize: '0.75rem', borderRadius: '8px' }}
+          title="Verificar atualização da base clínica no GitHub"
+        >
+          <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
+          <span className="no-print">Sincronizar</span>
+        </button>
       </div>
+
+      {/* Notificação de Sincronização */}
+      {syncResult && (
+        <div style={{
+          marginTop: '10px',
+          padding: '8px 12px',
+          borderRadius: '8px',
+          fontSize: '0.75rem',
+          background: syncResult.updated ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+          border: `1px solid ${syncResult.updated ? '#10b981' : '#3b82f6'}`,
+          color: syncResult.updated ? '#6ee7b7' : '#93c5fd',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px'
+        }}>
+          {syncResult.updated ? <Check size={14} /> : <AlertCircle size={14} />}
+          <span>{syncResult.message}</span>
+        </div>
+      )}
 
       {/* Seletor de Modo de Proteção Clínica */}
       <div style={{

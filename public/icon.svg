@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <!-- Escudo Protetor -->
+  <path d="M256 64 L394 116 C394 260 256 384 256 428 C256 384 118 260 118 116 Z" fill="url(#shield)"/>
+  <!-- Glóbulo Vermelho / Cruz Protetora -->
+  <circle cx="256" cy="220" r="64" fill="#ffffff" opacity="0.95"/>
+  <circle cx="256" cy="220" r="32" fill="#ef4444"/>
+  <text x="256" y="340" font-family="system-ui, sans-serif" font-size="44" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="2">G6PD</text>
+</svg>

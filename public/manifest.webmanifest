@@ -1,0 +1,19 @@
+{
+  "name": "G6PDApp — Segurança Clínica & Leitor de Rótulos",
+  "short_name": "G6PDApp",
+  "description": "Leitor inteligente de rótulos e guia de segurança clínica para Deficiência de G6PD (CID-10: D55.0). Gratuito e 100% offline.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1120",
+  "theme_color": "#0f172a",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
