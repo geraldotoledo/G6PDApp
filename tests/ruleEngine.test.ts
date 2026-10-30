@@ -1,6 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { analyzeIngredientsText } from '../src/engine/ruleEngine.ts';
+import { isValidRulesDatabase } from '../src/services/rulesSync.ts';
+import { DEFAULT_G6PD_DATABASE } from '../src/data/defaultRules.ts';
 
 describe('G6PDApp Rule Engine & Safety Invariants', () => {
 
@@ -176,6 +178,178 @@ describe('G6PDApp Rule Engine & Safety Invariants', () => {
         `Span sobreposto detectado: [${current.start}, ${current.end}] sobrepõe [${next.start}, ${next.end}]`
       );
     }
+  });
+
+  it('15. Normalizador de INS: "INS 223 e sal" não deve engolir conjunção "e" e deve bloquear INS 223 (🔴 RED_BLOCKED)', () => {
+    const rawLabel = `
+      INGREDIENTES: Farinha de trigo, gordura vegetal, conservante INS 223 e sal.
+      ALÉRGICOS: CONTÉM TRIGO.
+    `;
+    const result = analyzeIngredientsText(rawLabel);
+    assert.strictEqual(result.status, 'RED_BLOCKED');
+    assert.ok(result.matches.some(m => m.rule.id === 'sulfite-metabissulfito-sodio-223'));
+  });
+
+  it('16. Trava de Completude (Completeness Gate): Rejeitar rótulo vazio, tokens ilegíveis (???) ou excipientes truncados (🟡 YELLOW_INCOMPLETE_SCAN)', () => {
+    // 16a: Lista de ingredientes vazia entre início e fim
+    const emptyIngredients = `Ingredientes: ALÉRGICOS: CONTÉM TRIGO.`;
+    const resEmpty = analyzeIngredientsText(emptyIngredients);
+    assert.strictEqual(resEmpty.status, 'YELLOW_INCOMPLETE_SCAN');
+    assert.strictEqual(resEmpty.completeness.isComplete, false);
+
+    // 16b: Tokens ilegíveis explícitos
+    const illegible = `Ingredientes: farinha de trigo, ???, sal. ALÉRGICOS: CONTÉM GLÚTEN.`;
+    const resIllegible = analyzeIngredientsText(illegible);
+    assert.strictEqual(resIllegible.status, 'YELLOW_INCOMPLETE_SCAN');
+    assert.strictEqual(resIllegible.completeness.isComplete, false);
+
+    // 16c: Composição com excipientes truncados ou apenas q.s.p. sem listar veículo
+    const truncatedExcipients = `Composição: amoxicilina 500mg. Excipientes:`;
+    const resExcipients = analyzeIngredientsText(truncatedExcipients);
+    assert.strictEqual(resExcipients.status, 'YELLOW_INCOMPLETE_SCAN');
+    assert.strictEqual(resExcipients.completeness.isComplete, false);
+
+    const qspOnlyExcipients = `Composição: amoxicilina 500mg. Excipientes: q.s.p. 1 comprimido. Registro MS 1.2345`;
+    const resQsp = analyzeIngredientsText(qspOnlyExcipients);
+    assert.strictEqual(resQsp.status, 'YELLOW_INCOMPLETE_SCAN');
+    assert.strictEqual(resQsp.completeness.isComplete, false);
+  });
+
+  it('17. Expansão de Catálogo e Desambiguação de Corantes:', () => {
+    // 17a: Sulfitos INS 225, 226, 227 e 228
+    const res225 = analyzeIngredientsText(`Ingredientes: água, açúcar, conservador INS 225. ALÉRGICOS: NÃO CONTÉM.`);
+    assert.strictEqual(res225.status, 'RED_BLOCKED');
+    assert.ok(res225.matches.some(m => m.rule.id === 'sulfite-sulfito-potassio-225'));
+
+    const res226 = analyzeIngredientsText(`Ingredientes: amido, conservante INS 226. ALÉRGICOS: NÃO CONTÉM.`);
+    assert.strictEqual(res226.status, 'RED_BLOCKED');
+    assert.ok(res226.matches.some(m => m.rule.id === 'sulfite-sulfito-calcio-226'));
+
+    const res227 = analyzeIngredientsText(`Ingredientes: amido, conservante INS 227. ALÉRGICOS: NÃO CONTÉM.`);
+    assert.strictEqual(res227.status, 'RED_BLOCKED');
+    assert.ok(res227.matches.some(m => m.rule.id === 'sulfite-bissulfito-calcio-227'));
+
+    const res228 = analyzeIngredientsText(`Ingredientes: amido, conservante INS 228. ALÉRGICOS: NÃO CONTÉM.`);
+    assert.strictEqual(res228.status, 'RED_BLOCKED');
+    assert.ok(res228.matches.some(m => m.rule.id === 'sulfite-bissulfito-potassio-228'));
+
+    // 17b: Medicamentos Cloranfenicol e Isoniazida geram CAUTION
+    const resCloran = analyzeIngredientsText('Cloranfenicol colírio 5mg/ml', { isSearchQuery: true });
+    assert.strictEqual(resCloran.status, 'YELLOW_ATTENTION');
+    assert.ok(resCloran.matches.some(m => m.rule.id === 'drug-cloranfenicol'));
+
+    const resIso = analyzeIngredientsText('Isoniazida 100mg comprimidos', { isSearchQuery: true });
+    assert.strictEqual(resIso.status, 'YELLOW_ATTENTION');
+    assert.ok(resIso.matches.some(m => m.rule.id === 'drug-isoniazida'));
+
+    // 17c: Corante artificial genérico e "colorido artificialmente" geram RED_BLOCKED
+    const resCoranteArt = analyzeIngredientsText(`Ingredientes: farinha, açúcar, corante artificial e sal. CONTÉM GLÚTEN.`);
+    assert.strictEqual(resCoranteArt.status, 'RED_BLOCKED');
+    assert.ok(resCoranteArt.matches.some(m => m.rule.id === 'dye-artificial-generico'));
+
+    const resColoridoArt = analyzeIngredientsText(`Ingredientes: água, açúcar, colorido artificialmente. NÃO CONTÉM GLÚTEN.`);
+    assert.strictEqual(resColoridoArt.status, 'RED_BLOCKED');
+    assert.ok(resColoridoArt.matches.some(m => m.rule.id === 'dye-artificial-generico'));
+
+    // 17d: Corante genérico isolado gera YELLOW_ATTENTION
+    const resCoranteAmb = analyzeIngredientsText(`Ingredientes: farinha, açúcar, corante e sal. CONTÉM GLÚTEN.`);
+    assert.strictEqual(resCoranteAmb.status, 'YELLOW_ATTENTION');
+    assert.ok(resCoranteAmb.matches.some(m => m.rule.id === 'dye-corante-generico-ambiguo'));
+
+    // 17e: Corantes naturais ("corante natural de urucum", "corante natural urucum", "corante caramelo I", "corante de beterraba", "betacaroteno") suprimem a regra ambígua (GREEN_SAFE)
+    const resUrucum = analyzeIngredientsText(
+      `Ingredientes: farinha de trigo enriquecida, óleo vegetal, corante natural de urucum, corante natural urucum, corante caramelo I, corante de beterraba, corante natural betacaroteno (INS 160a) e sal refinado. CONTÉM GLÚTEN.`
+    );
+    assert.strictEqual(resUrucum.status, 'GREEN_SAFE');
+    assert.ok(!resUrucum.matches.some(m => m.rule.id === 'dye-corante-generico-ambiguo'));
+    assert.ok(!resUrucum.matches.some(m => m.rule.id === 'dye-caramelo-generico-ambiguo'));
+    assert.ok(resUrucum.matches.some(m => m.rule.id === 'dye-urucum-160b'));
+    assert.ok(resUrucum.matches.some(m => m.rule.id === 'dye-caramelo-i-150a'));
+    assert.ok(resUrucum.matches.some(m => m.rule.id === 'dye-caroteno-160a'));
+
+    // 17f: Segunda ocorrência genérica independente no mesmo rótulo NÃO é suprimida (YELLOW_ATTENTION)
+    const resDual = analyzeIngredientsText(
+      `Ingredientes: farinha de trigo, corante natural de urucum, açúcar e corante. CONTÉM GLÚTEN.`
+    );
+    assert.strictEqual(resDual.status, 'YELLOW_ATTENTION');
+    assert.ok(resDual.matches.some(m => m.rule.id === 'dye-urucum-160b'));
+    assert.ok(resDual.matches.some(m => m.rule.id === 'dye-corante-generico-ambiguo'));
+  });
+
+  it('18. Validação Estrutural Profunda da Base de Regras (isValidRulesDatabase):', () => {
+    // 18a: Base oficial carregada deve ser válida
+    assert.strictEqual(isValidRulesDatabase(DEFAULT_G6PD_DATABASE), true);
+
+    // 18b: Rejeitar base com regra sem riskLevel
+    const invalidNoRisk = {
+      ...DEFAULT_G6PD_DATABASE,
+      rules: [
+        ...DEFAULT_G6PD_DATABASE.rules,
+        {
+          id: 'test-invalid-no-risk',
+          name: 'Teste Sem Risco',
+          category: 'SULFITE',
+          protocolSource: 'BRAZIL_SBP_APAE',
+          clinicalMechanism: 'teste',
+          synonyms: ['teste']
+        } as any
+      ]
+    };
+    assert.strictEqual(isValidRulesDatabase(invalidNoRisk), false);
+
+    // 18c: Rejeitar base com sinônimos vazios
+    const invalidEmptySynonyms = {
+      ...DEFAULT_G6PD_DATABASE,
+      rules: [
+        ...DEFAULT_G6PD_DATABASE.rules,
+        {
+          id: 'test-invalid-empty-synonyms',
+          name: 'Teste Sinônimos Vazios',
+          category: 'SULFITE',
+          riskLevel: 'HIGH_RISK',
+          protocolSource: 'BRAZIL_SBP_APAE',
+          clinicalMechanism: 'teste',
+          synonyms: []
+        } as any
+      ]
+    };
+    assert.strictEqual(isValidRulesDatabase(invalidEmptySynonyms), false);
+
+    // 18d: Rejeitar base com ID duplicado
+    const invalidDuplicateId = {
+      ...DEFAULT_G6PD_DATABASE,
+      rules: [
+        ...DEFAULT_G6PD_DATABASE.rules,
+        {
+          id: DEFAULT_G6PD_DATABASE.rules[0].id,
+          name: 'Duplicado',
+          category: 'SULFITE',
+          riskLevel: 'HIGH_RISK',
+          protocolSource: 'BRAZIL_SBP_APAE',
+          clinicalMechanism: 'teste',
+          synonyms: ['teste']
+        } as any
+      ]
+    };
+    assert.strictEqual(isValidRulesDatabase(invalidDuplicateId), false);
+
+    // 18e: Rejeitar schemaVersion incompatível, rulesVersion malformada ou updatedAt inválido
+    assert.strictEqual(isValidRulesDatabase({ ...DEFAULT_G6PD_DATABASE, schemaVersion: 2 }), false);
+    assert.strictEqual(isValidRulesDatabase({ ...DEFAULT_G6PD_DATABASE, rulesVersion: 'invalida' }), false);
+    assert.strictEqual(isValidRulesDatabase({ ...DEFAULT_G6PD_DATABASE, updatedAt: '26/10/2026' }), false);
+    assert.strictEqual(isValidRulesDatabase({ ...DEFAULT_G6PD_DATABASE, sources: [] }), false);
+  });
+
+  it('19. Medicamento de princípio ativo seguro com excipiente restrito: bloquear apresentação sem confundir status do princípio ativo', () => {
+    const syrupWithForbiddenDye = `
+      Composição: Cada 5 mL contém Amoxicilina tri-hidratada 250mg.
+      Excipientes: sacarose, citrato de sódio, corante amarelo crepúsculo (INS 110) e água purificada.
+    `;
+    const result = analyzeIngredientsText(syrupWithForbiddenDye);
+
+    assert.strictEqual(result.status, 'RED_BLOCKED');
+    assert.ok(result.safeActiveDrugsDetected.some(m => m.rule.id === 'drug-amoxicilina'));
+    assert.ok(result.restrictedExcipientsOrAdditivesDetected.some(m => m.rule.id === 'dye-amarelo-crepusculo-110'));
   });
 
 });

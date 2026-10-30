@@ -9,6 +9,7 @@ const START_ANCHORS = [
   'excipientes:',
   'excipientes',
   'veiculo:',
+  'veiculo',
   'lista de ingredientes:',
   'lista de ingredientes'
 ];
@@ -28,6 +29,11 @@ const END_ANCHORS = [
   'validade:',
   'registro ms',
   'modo de conservacao',
+  'modo de usar',
+  'modo de uso',
+  'instrucoes de uso',
+  'posologia',
+  'advertencias',
   'conservar em local',
   'sac:'
 ];
@@ -64,12 +70,34 @@ export function evaluateLabelCompleteness(rawText: string): CompletenessCheckRes
     }
   }
 
+  const hasStart = startIdx !== -1;
+  const afterStartIdx = hasStart ? startIdx + (matchedStart?.length || 0) : 0;
+
+  // Checar se é composição de medicamento com seção de excipientes/veículo explícita
+  let excipientsAnchorIdx = -1;
+  let excipientsAnchorLen = 0;
+  const EXCIPIENTS_SUB_ANCHORS = ['excipientes:', 'excipientes', 'veiculo:', 'veiculo'];
+  if (hasStart && matchedStart?.includes('composicao')) {
+    for (const sub of EXCIPIENTS_SUB_ANCHORS) {
+      const idx = normalized.indexOf(sub, afterStartIdx);
+      if (idx !== -1 && (excipientsAnchorIdx === -1 || idx < excipientsAnchorIdx)) {
+        excipientsAnchorIdx = idx;
+        excipientsAnchorLen = sub.length;
+      }
+    }
+  }
+
   // 2. Procurar âncora de fim
+  // Se houver excipientes após composicao, a busca por fim deve considerar o que vem após os excipientes
+  const searchEndFrom = excipientsAnchorIdx !== -1
+    ? excipientsAnchorIdx + excipientsAnchorLen
+    : afterStartIdx;
+
   let matchedEnd: string | undefined;
   let endIdx = -1;
 
   for (const anchor of END_ANCHORS) {
-    const idx = normalized.indexOf(anchor, startIdx !== -1 ? startIdx + (matchedStart?.length || 0) : 0);
+    const idx = normalized.indexOf(anchor, searchEndFrom);
     if (idx !== -1) {
       if (endIdx === -1 || idx < endIdx) {
         endIdx = idx;
@@ -78,25 +106,66 @@ export function evaluateLabelCompleteness(rawText: string): CompletenessCheckRes
     }
   }
 
-  // Se houver ponto final formal após a lista de ingredientes com pelo menos 3 vírgulas/itens
-  const hasSentencePeriod = startIdx !== -1 && /[a-z0-9]\.\s+/i.test(normalized.slice(startIdx));
+  const effectiveEnd = endIdx !== -1 ? endIdx : normalized.length;
+  const contentBetween = normalized.slice(afterStartIdx, effectiveEnd);
+  const isExcipientsSection =
+    excipientsAnchorIdx !== -1 ||
+    matchedStart?.startsWith('excipientes') ||
+    matchedStart?.startsWith('veiculo');
 
-  // 3. Avaliar ruído / tokens ilegíveis (ex: "???", caracteres estranhos)
-  const tokens = normalized.split(/\s+/);
-  const unreadableTokens = tokens.filter(t => /\?{2,}|[^\w\s,\.\-:\(\)\/]{2,}/.test(t));
-  const unreadableRatio = tokens.length > 0 ? unreadableTokens.length / tokens.length : 0;
+  // A captura pode começar nos excipientes ou chegar a eles após a composição.
+  // Unidades e formas de apresentação não identificam substâncias do veículo.
+  const excipientsContent = normalized.slice(searchEndFrom, effectiveEnd);
+  const cleanedExcipients = excipientsContent
+    .replace(/\bq\.?\s*s\.?\s*p\.?/gi, ' ')
+    .replace(
+      /\b(comprimidos?|capsulas?|drageas?|gotas?|saches?|envelopes?|ml|mg|g|mcg|ui|cada|contem|veiculo|excipientes?)\b/gi,
+      ' '
+    );
+  const hasRealExcipientsContent =
+    !isExcipientsSection || /[a-z]{3,}/i.test(cleanedExcipients);
+  const hasRealContent = /[a-z]{3,}/i.test(contentBetween);
 
-  const hasStart = startIdx !== -1;
+  // Não usar pontos de registro/instruções posteriores para fechar a lista.
+  const textAfterSearchFrom = excipientsContent.replace(/\bq\.?\s*s\.?\s*p\.?/gi, '');
+  const hasSentencePeriod =
+    hasStart && /[a-z0-9]{3,}\.(?:\s+|$)/i.test(textAfterSearchFrom);
   const hasEnd = endIdx !== -1 || (hasStart && hasSentencePeriod);
 
-  // IsComplete requer tanto início quanto fim demarcado, e baixa taxa de ruído
-  const isComplete = hasStart && hasEnd && unreadableRatio < 0.15;
+  // Corrupção dentro da lista não pode ser diluída por texto legível ao redor.
+  // Preservar percentuais, códigos, abreviaturas e pontuação química legítima.
+  const illegiblePattern = /\?{2,}|\uFFFD|[^\p{L}\p{N}\s,.;:\-()\/%+°µ\[\]&'’®™]{2,}/u;
+  const hasExplicitIllegible = illegiblePattern.test(contentBetween);
+  const tokens = contentBetween.split(/\s+/).filter(Boolean);
+  const unreadableTokens = tokens.filter(t => illegiblePattern.test(t));
+  const unreadableRatio = tokens.length > 0 ? unreadableTokens.length / tokens.length : 0;
+
+  // isComplete requer:
+  // - Âncora de início
+  // - Âncora de fim ou ponto final válido após o conteúdo
+  // - Conteúdo real entre âncoras (não vazio)
+  // - Excipientes não truncados se for composição de medicamento
+  // - Sem marcadores explícitos de ilegibilidade (??? ou replacement char)
+  // - Baixa taxa geral de ruído (< 15%)
+  const isComplete =
+    hasStart &&
+    hasEnd &&
+    hasRealContent &&
+    hasRealExcipientsContent &&
+    !hasExplicitIllegible &&
+    unreadableRatio < 0.15;
 
   let reason: string | undefined;
   if (!hasStart && !hasEnd) {
     reason = 'Não foi encontrada a palavra "INGREDIENTES" nem os avisos finais ("ALÉRGICOS/GLÚTEN"). A foto pode mostrar apenas a tabela nutricional ou a frente do pacote.';
   } else if (!hasStart) {
     reason = 'Início da lista ("INGREDIENTES:") não localizado. A foto pode ter começado no meio da lista.';
+  } else if (hasExplicitIllegible) {
+    reason = 'Trecho ilegível ou corrompido na lista de ingredientes/excipientes. Confira o texto com o rótulo e faça uma nova leitura.';
+  } else if (!hasRealContent) {
+    reason = 'Lista de ingredientes vazia entre as âncoras de início e fim do rótulo.';
+  } else if (isExcipientsSection && !hasRealExcipientsContent) {
+    reason = 'Seção de excipientes do medicamento vazia ou truncada. Não foi possível confirmar os componentes do veículo/xarope.';
   } else if (!hasEnd) {
     reason = 'Final da lista de ingredientes não demarcado (falta aviso de "ALÉRGICOS", "CONTÉM GLÚTEN" ou ponto final). A embalagem pode estar cortada no fim ou com reflexo apagando a última linha.';
   } else if (unreadableRatio >= 0.15) {

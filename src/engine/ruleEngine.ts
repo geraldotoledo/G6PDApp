@@ -76,6 +76,7 @@ export function analyzeIngredientsText(rawText: string, options?: AnalyzeOptions
   const matches: RuleMatch[] = [];
   const rawSpans: TextHighlightSpan[] = [];
   const pediatricSyrupAlerts: string[] = [];
+  const specificSpans: Span[] = [];
 
   for (const safe of safeSpans) {
     rawSpans.push({
@@ -87,7 +88,12 @@ export function analyzeIngredientsText(rawText: string, options?: AnalyzeOptions
     });
   }
 
-  for (const rule of database.rules) {
+  // Avaliar regras específicas primeiro e regras ambíguas por último
+  const sortedRules = [...database.rules].sort(
+    (a, b) => (a.isAmbiguous ? 1 : 0) - (b.isAmbiguous ? 1 : 0)
+  );
+
+  for (const rule of sortedRules) {
     // Determinar risco efetivo conforme o perfil selecionado
     let effectiveRisk = rule.riskLevel;
 
@@ -137,17 +143,48 @@ export function analyzeIngredientsText(rawText: string, options?: AnalyzeOptions
           continue;
         }
 
+        // Se a regra for ambígua e o trecho sobrepor uma regra específica já casada, IGNORAR!
+        if (rule.isAmbiguous) {
+          const overlapsSpecific = specificSpans.some(
+            s => Math.max(start, s.start) < Math.min(end, s.end)
+          );
+          if (overlapsSpecific) {
+            continue;
+          }
+        }
+
         const matchedTermStr = normalized.substring(start, end);
         const isRed = effectiveRisk === 'HIGH_RISK' || effectiveRisk === 'RESTRICTED_BR';
+        const spanType = isRed ? 'RED' : (effectiveRisk === 'SAFE' ? 'SAFE_LOOKALIKE' : 'YELLOW');
+
+        // Se for regra específica de corante, incluir eventual prefixo qualificador imediato ("corante natural de ", "corante ")
+        // para impedir falso alerta da regra genérica na mesma expressão
+        let spanStartForSpecific = start;
+        if (!rule.isAmbiguous && rule.category.startsWith('DYE_')) {
+          const beforeText = normalized.slice(0, start);
+          const dyePrefixMatch = /(?:^|[^a-z0-9])(corantes?(?:\s+(?:naturais?|natural|artificiais?|artificial|alimenticios?|inorganicos?|organicos?|simples))?(?:\s*:\s*|\s+de\s+|\s+da\s+|\s+do\s+|\s+)(?:extrato\s+de\s+|vermelho\s+de\s+)?)(\s*\(?\s*)$/i.exec(beforeText);
+          if (dyePrefixMatch) {
+            const fullPrefix = dyePrefixMatch[1] + (dyePrefixMatch[2] || '');
+            spanStartForSpecific = start - fullPrefix.length;
+          }
+        }
 
         rawSpans.push({
-          start,
+          start: spanStartForSpecific,
           end,
-          text: matchedTermStr,
-          type: isRed ? 'RED' : 'YELLOW',
+          text: normalized.substring(spanStartForSpecific, end),
+          type: spanType,
           ruleName: rule.name,
           message: rule.clinicalMechanism
         });
+
+        if (!rule.isAmbiguous) {
+          specificSpans.push({
+            start: spanStartForSpecific,
+            end,
+            term: normalized.substring(spanStartForSpecific, end)
+          });
+        }
 
         const existing = matches.find(m => m.rule.id === rule.id);
         if (!existing) {
@@ -203,8 +240,19 @@ export function analyzeIngredientsText(rawText: string, options?: AnalyzeOptions
   }
 
   // -----------------------------------------------------------
-  // 4. Determinar Veredito Final (Semáforo)
+  // 4. Determinar Veredito Final (Semáforo) e Separação Ativo vs Excipientes
   // -----------------------------------------------------------
+  const safeActiveDrugsDetected = matches.filter(
+    m => m.effectiveRisk === 'SAFE' && m.rule.category.startsWith('DRUG_')
+  );
+  const restrictedExcipientsOrAdditivesDetected = matches.filter(
+    m =>
+      (m.effectiveRisk === 'HIGH_RISK' ||
+        m.effectiveRisk === 'RESTRICTED_BR' ||
+        m.effectiveRisk === 'CAUTION') &&
+      !m.rule.category.startsWith('DRUG_')
+  );
+
   const hasRed = matches.some(m => m.effectiveRisk === 'HIGH_RISK' || m.effectiveRisk === 'RESTRICTED_BR');
   const hasYellow = matches.some(m => m.effectiveRisk === 'CAUTION');
 
@@ -217,14 +265,32 @@ export function analyzeIngredientsText(rawText: string, options?: AnalyzeOptions
     status = 'RED_BLOCKED';
     statusTitle = '🔴 NÃO CONSUMIR (Alerta para G6PD)';
     statusBadge = 'BLOQUEADO';
-    const forbiddenNames = Array.from(new Set(matches.filter(m => m.effectiveRisk === 'HIGH_RISK' || m.effectiveRisk === 'RESTRICTED_BR').map(m => m.rule.name)));
-    summary = `Identificado(s) componente(s) restrito(s) para Deficiência de G6PD: ${forbiddenNames.join(', ')}.`;
+    const forbiddenNames = Array.from(
+      new Set(
+        matches
+          .filter(m => m.effectiveRisk === 'HIGH_RISK' || m.effectiveRisk === 'RESTRICTED_BR')
+          .map(m => m.rule.name)
+      )
+    );
+    if (safeActiveDrugsDetected.length > 0 && restrictedExcipientsOrAdditivesDetected.length > 0) {
+      const safeDrugNames = Array.from(new Set(safeActiveDrugsDetected.map(m => m.rule.name))).join(', ');
+      summary = `O princípio ativo (${safeDrugNames}) é seguro isoladamente, mas esta apresentação foi BLOQUEADA por conter excipiente/aditivo restrito para Deficiência de G6PD: ${forbiddenNames.join(', ')}.`;
+    } else {
+      summary = `Identificado(s) componente(s) restrito(s) para Deficiência de G6PD: ${forbiddenNames.join(', ')}.`;
+    }
   } else if (hasYellow) {
     status = 'YELLOW_ATTENTION';
     statusTitle = '🟡 ATENÇÃO / VERIFICAR';
     statusBadge = 'ATENÇÃO';
-    const cautionNames = Array.from(new Set(matches.map(m => m.rule.name)));
-    summary = `Identificado(s) item(ns) que exigem atenção médica, de dose ou confirmação com o fabricante: ${cautionNames.join(', ')}.`;
+    const cautionNames = Array.from(
+      new Set(matches.filter(m => m.effectiveRisk === 'CAUTION').map(m => m.rule.name))
+    );
+    if (safeActiveDrugsDetected.length > 0 && restrictedExcipientsOrAdditivesDetected.length > 0) {
+      const safeDrugNames = Array.from(new Set(safeActiveDrugsDetected.map(m => m.rule.name))).join(', ');
+      summary = `O princípio ativo (${safeDrugNames}) é seguro isoladamente, mas esta apresentação contém excipiente/aditivo que exige cautela ou confirmação com o fabricante: ${cautionNames.join(', ')}.`;
+    } else {
+      summary = `Identificado(s) item(ns) que exigem atenção médica, de dose ou confirmação com o fabricante: ${cautionNames.join(', ')}.`;
+    }
   } else if (!completeness.isComplete && !isSearchQuery) {
     // BLINDAGEM 1: Se não tem proibido mas a foto está cortada/com reflexo
     status = 'YELLOW_INCOMPLETE_SCAN';
@@ -249,6 +315,8 @@ export function analyzeIngredientsText(rawText: string, options?: AnalyzeOptions
     normalizedText: normalized,
     completeness,
     matches,
+    safeActiveDrugsDetected,
+    restrictedExcipientsOrAdditivesDetected,
     safeLookalikesDetected: detectedSafeLookalikes,
     pediatricSyrupAlerts,
     highlightSpans,

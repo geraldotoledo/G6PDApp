@@ -2,7 +2,7 @@
 
 ## 1. Limites deste registro
 
-Este registro descreve o catálogo **local ainda não commitado** em `src/data/rules.json`, versão **2026.10.3**, atualizado em **26/10/2026**, e sua cópia de distribuição `public/g6pd_rules.json`. Na verificação de 30/10/2026, o commit `406ec3e` em `master` continha a versão **2026.10.1**, com 62 regras. A publicação desta documentação isoladamente não inclui a base local nem demonstra o estado implantado.
+Este registro descreve o catálogo em `src/data/rules.json`, versão **2026.10.3**, atualizado em **26/10/2026**, e sua cópia de distribuição `public/g6pd_rules.json`. Na organização documental de 30/10/2026, essa versão estava apenas no diretório local, enquanto o commit `406ec3e` em `master` continha a versão **2026.10.1**, com 62 regras. A publicação exclusivamente documental não incluiu a base local; consulte o histórico Git para verificar integração posterior.
 
 As 71 regras recebem natureza da classificação (`evidenceKind`), vínculo (`sourceRef`), estado documental (`provenanceStatus`) e nota específica. São **7 DOCUMENTED e 64 PENDING_REVIEW**. Essas contagens descrevem o cadastro, não resultado de ensaio automatizado ou aprovação profissional.
 

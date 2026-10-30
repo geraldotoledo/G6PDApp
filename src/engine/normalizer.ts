@@ -22,21 +22,25 @@ export function normalizeText(rawText: string): string {
   // 2. Remover acentuação e passar para minúsculas
   text = stripAccents(text).toLowerCase();
 
-  // 3. Normalizar variações de códigos INS e E-numbers
-  // Ex: "ins  102", "ins-102", "ins102", "ins. 102", "e-102", "e 102"
-  text = text.replace(/\bins[\s\.\-_]*([0-9]{3}[a-z]?|[0-9]{3}\s*(?:iv|iii|ii|i))\b/gi, (_match, code) => {
-    return `ins ${code.replace(/\s+/g, '')}`;
+  // 3. Normalizar variações de códigos INS e E-numbers com correção de homóglifos ópticos (ex: "ins 15o d" -> "ins 150d")
+  // Sufixos válidos com espaço são algarismos romanos (iv, iii, ii, i) ou letras (a, b, c, d, f) - NUNCA a conjunção portuguesa "e"
+  text = text.replace(
+    /\bins[\s\.\-_]*([0-9oO]{3})(?:([a-df-h]|i{1,3}|iv)|\s+(iv|iii|ii|i|[a-df]))\b/gi,
+    (_match, num, attachedSuffix, spacedSuffix) => {
+      const fixedNum = num.replace(/[oO]/g, '0');
+      const suffix = (attachedSuffix || spacedSuffix || '').trim().toLowerCase();
+      return `ins ${fixedNum}${suffix}`;
+    }
+  );
+
+  // Normalizar códigos INS puramente numéricos (ex: "ins  223", "ins-223", "ins223" -> "ins 223") sem engolir conjunção "e"
+  text = text.replace(/\bins[\s\.\-_]*([0-9oO]{3})\b/gi, (_match, num) => {
+    return `ins ${num.replace(/[oO]/g, '0')}`;
   });
 
-  text = text.replace(/\be[\s\.\-_]*([0-9]{3}[a-z]?)\b/gi, (_match, code) => {
-    return `e${code}`;
-  });
-
-  // 4. Correção de homóglifos ópticos em padrões de código INS
-  // Ex: "ins 15o d" ou "ins 15od" -> "ins 150d"
-  text = text.replace(/\bins\s*([0-9oO]{3})\s*([a-ziv]+)?\b/gi, (_match, num, suffix) => {
-    const fixedNum = num.replace(/[oO]/g, '0');
-    return `ins ${fixedNum}${suffix ? suffix.trim() : ''}`;
+  // Normalizar E-numbers (ex: "e-102", "e 102", "e102", "e-150d")
+  text = text.replace(/\be[\s\.\-_]*([0-9]{3}[a-df-h]?)\b/gi, (_match, code) => {
+    return `e${code.toLowerCase()}`;
   });
 
   // 5. Correção de homóglifos pontuais comuns em palavras químicas conhecidas

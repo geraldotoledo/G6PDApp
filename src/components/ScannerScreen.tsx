@@ -439,9 +439,9 @@ export const ScannerScreen: React.FC<ScannerScreenProps> = ({
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                 <Info size={20} color="#f59e0b" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <div style={{ fontSize: '0.84rem', lineHeight: '1.5' }}>
-                  <strong>Trava de Segurança Anti-Falso-Negativo:</strong> O aplicativo não encontrou termos proibidos no trecho lido, mas a lista de ingredientes parece cortada no início ou no fim (sem os avisos de "ALÉRGICOS" ou ponto final).
+                  <strong>Conferência pendente:</strong> Não foi possível confirmar uma lista completa e legível de ingredientes ou excipientes. Este resultado não libera o produto.
                   <br />
-                  <em>Para 100% de segurança, aproxime a câmera sem reflexo para enquadrar a lista inteira.</em>
+                  <em>Compare o texto com o rótulo físico e faça uma nova leitura da lista inteira, sem cortes ou reflexos.</em>
                 </div>
               </div>
             </div>

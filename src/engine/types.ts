@@ -27,6 +27,25 @@ export type ProtocolSource =
   | 'FAVISMO_IT'
   | 'MINISTERIO_DA_SAUDE';
 
+export type EvidenceKind =
+  | 'DIRECT_HEMOLYTIC_RISK'
+  | 'PEDIATRIC_PRECAUTION'
+  | 'DOSE_DEPENDENT_CAUTION'
+  | 'AMBIGUOUS_LABEL'
+  | 'SAFE_REFERENCE';
+
+export type ProvenanceStatus = 'DOCUMENTED' | 'PENDING_REVIEW';
+
+export interface G6PDSourceReference {
+  id: string;
+  name: string;
+  organization: string;
+  documentTitle: string;
+  editionOrDate: string;
+  url: string;
+  sectionOrTable: string;
+}
+
 export interface G6PDRule {
   id: string;
   name: string;
@@ -40,6 +59,10 @@ export interface G6PDRule {
   clinicalMechanism: string; // Explicação médica sucinta
   pediatricSyrupWarning?: string; // Alerta específico de excipientes se for remédio
   isAmbiguous?: boolean;     // Ex.: "corante caramelo" sem especificar I ou IV
+  evidenceKind: EvidenceKind; // Natureza da classificação; não é aprovação clínica.
+  sourceRef: string;
+  provenanceStatus: ProvenanceStatus;
+  provenanceNote?: string;   // Obrigatório e não vazio quando PENDING_REVIEW.
 }
 
 export interface SafeLookalike {
@@ -54,7 +77,7 @@ export interface G6PDRulesDatabase {
   rulesVersion: string;
   updatedAt: string;
   description: string;
-  sources: { name: string; url: string }[];
+  sources: G6PDSourceReference[];
   safeLookalikes: SafeLookalike[];
   rules: G6PDRule[];
 }
@@ -107,6 +130,8 @@ export interface AnalysisResult {
   normalizedText: string;
   completeness: CompletenessCheckResult;
   matches: RuleMatch[];
+  safeActiveDrugsDetected: RuleMatch[];
+  restrictedExcipientsOrAdditivesDetected: RuleMatch[];
   safeLookalikesDetected: SafeLookalike[];
   pediatricSyrupAlerts: string[];
   highlightSpans: TextHighlightSpan[];
