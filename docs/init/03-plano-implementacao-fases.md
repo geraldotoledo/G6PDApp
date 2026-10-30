@@ -1,6 +1,8 @@
 # 03 — Plano de Implementação em Fases (G6PDApp)
 
-Este documento define o roteiro executável para construir, testar e publicar o **G6PDApp** a partir da máquina local (`c:\sourcea\G6PDApp`, sem necessidade de Administrador, usando **Bun/Node.js + TypeScript + React/Vite + Capacitor + GitHub Actions**).
+> Documento histórico: este roteiro foi substituído pelo [plano de correção conectado](../planejamento/plano-correcao.md). Promessas e classificações abaixo não são garantia ou orientação clínica atual.
+
+Este documento registrava o roteiro inicial para construir, testar e publicar o **G6PDApp** na máquina local, sem necessidade de Administrador, usando **Bun/Node.js + TypeScript + React/Vite + Capacitor + GitHub Actions**. O caminho local foi omitido nesta cópia de arquivo.
 
 ---
 

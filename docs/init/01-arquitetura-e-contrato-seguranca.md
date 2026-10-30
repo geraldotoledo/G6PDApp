@@ -1,5 +1,7 @@
 # 01 — Arquitetura e Contrato de Segurança do G6PDApp
 
+> Histórico: o desenho abaixo contém afirmações e garantias não validadas. Consulte [arquitetura](../produto/arquitetura.md), [base clínica](../clinica/base-clinica.md) e [plano de correção](../planejamento/plano-correcao.md) para o contexto vigente.
+
 Este documento consolida o contrato arquitetural, os invariantes de segurança clínica e as decisões técnicas do **G6PDApp**.
 
 ---

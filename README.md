@@ -1,38 +1,25 @@
-# G6PDApp — Leitor Inteligente de Rótulos, Bulas e Guia de Segurança para Deficiência de G6PD
+# G6PDApp — Apoio à leitura de rótulos e bulas
 
-Aplicativo gratuito, *local-first* (funciona 100% offline) e de custo operacional zero para leitura de rótulos de alimentos, medicamentos (princípios ativos e excipientes) e códigos de barras, voltado a famílias, escolas e cuidadores de crianças com **Deficiência de Glicose-6-Fosfato Desidrogenase (G6PD — CID-10: D55.0)**.
+Projeto de aplicativo gratuito para ajudar famílias, escolas e cuidadores a identificar componentes que merecem atenção na deficiência de G6PD. Combina leitura de composição, consulta de produtos e regras rastreáveis, com encaminhamento opcional à IA do usuário.
 
----
+O objetivo é oferecer informação compreensível para apoiar decisões, com alertas proporcionais e explicação das limitações. Resultado do aplicativo não certifica segurança de consumo nem substitui avaliação profissional.
 
-## 🎯 Propósito e Invariante Central
+## Comece aqui
 
-A Deficiência de G6PD reduz a proteção das hemácias contra o estresse oxidativo. O contato com agentes oxidantes (determinados medicamentos, feijão-fava, quinina, naftalina, henna e, nos protocolos pediátricos preventivos brasileiros, corantes artificiais e sulfitos) pode desencadear **anemia hemolítica aguda**.
+- [Índice e autoridade dos documentos](docs/index.md)
+- [Contexto, público e objetivos](docs/produto/contexto.md)
+- [Estado atual e pendências](docs/governanca/estado-atual.md)
+- [Propostas em discussão](docs/governanca/propostas.md) e [decisões registradas](docs/governanca/decisoes.md)
+- [Como propor, revisar, implementar e atualizar a documentação](CONTRIBUTING.md)
 
-> **Invariante #1 de Engenharia (`Zero Falsos Negativos`)**:
-> O aplicativo **jamais** depende da opinião aberta de uma IA generativa para liberar um produto (`🟢 LIVRE`). O veredito é dado por um **Motor de Regras Determinístico Auditável** combinado com travas estritas de completude de leitura óptica (OCR) e desambiguação química.
+## Limites atuais
 
----
+A revisão clínica está incompleta; consulte o [registro de evidências e lacunas](docs/clinica/base-clinica.md). Testes de software não comprovam validade clínica. O plano vigente prioriza uso conectado; funcionamento integral offline, entrega Android e publicação em loja exigem evidência própria e não devem ser presumidos pelos registros iniciais.
 
-## 📚 Documentação Estrutural do Projeto
+Em 30/10/2026, esta documentação também descreve alterações locais ainda não commitadas: a base local está na versão 2026.10.3, com 71 regras; o commit `406ec3e` em `master` contém a versão 2026.10.1, com 62 regras. Uma publicação apenas da documentação não inclui essas alterações de código e base, nem comprova a versão implantada no aplicativo.
 
-Toda a concepção clínica, arquitetural e de engenharia está documentada na pasta [`docs/`](./docs/):
+A gratuidade e a baixa dependência de serviços pagos são objetivos de produto, não garantias de capacidade ilimitada de terceiros. Leia o estado atual antes de reutilizar promessas dos documentos históricos.
 
-1. **[01 — Arquitetura e Contrato de Segurança](./docs/01-arquitetura-e-contrato-seguranca.md)**
-   * Arquitetura em Cascata (Câmera Dupla EAN + OCR Local + Motor Determinístico + Handoff para IA do Usuário).
-   * **As 4 Blindagens Críticas de Engenharia**:
-     1. Trava de Completude Estrutural do Rótulo (proteção contra reflexo/foto cortada).
-     2. Normalizador de Homóglifos OCR + Whitelist de Falsos Amigos Químicos (*Sulfato* $\neq$ *Sulfito*, *Vitamina K1* $\neq$ *K3*, *Caramelo I* $\neq$ *III/IV*).
-     3. Duplo Veredito para Medicamentos Pediátricos (Princípio Ativo vs. Alerta de Corantes nos Excipientes).
-     4. Estratégia Híbrida PWA + Capacitor (Google ML Kit Nativo via GitHub Actions sem exigir Admin na máquina de desenvolvimento).
-   * Sincronização Trimestral Gratuita (`g6pd_rules.json` via GitHub Pages / CDN com validação de integridade).
-   * Botão *"Analisar a fundo com minha IA"* (`navigator.share` / Android Intents / Deep Links) e Assistente de Voz Nativo.
-   * Proteção Legal e Requisitos da Google Play Store.
+## Desenvolvimento local
 
-2. **[02 — Base Clínica de Referência e Fontes Oficiais](./docs/02-base-clinica-referencia.md)**
-   * Distinção entre o Consenso Farmacogenético Internacional (CPIC / OMS / Favismo.it) e o Protocolo Pediátrico Preventivo Brasileiro (Ministério da Saúde / EBSERH / SBP / APAE).
-   * Tabelas completas de Corantes (Códigos INS e E-Numbers), Conservantes Sulfitos, Antioxidantes Sintéticos, Alimentos Proibidos, Medicamentos (Proibidos vs. Cautela vs. Seguros com atenção a excipientes) e Químicos Domésticos.
-   * Sinais de Alerta de Crise Hemolítica e modelo do **Cartão de Bolso e Emergência (Modo Escola)**.
-   * Lista de Fontes Oficiais para Auditoria Trimestral.
-
-3. **[03 — Plano de Implementação em Fases](./docs/03-plano-implementacao-fases.md)**
-   * Roteiro executável dividido em 5 Fases (da Base de Dados Auditada e Suíte de Testes Clínicos até a publicação do PWA e geração automatizada do `.apk`/`.aab` para a Google Play Store).
+Com as dependências já disponíveis, `npm run dev` inicia o desenvolvimento. Comandos de validação e critérios de escolha estão em [CONTRIBUTING.md](CONTRIBUTING.md). Instalações, publicação e operações remotas dependem de autorização específica.

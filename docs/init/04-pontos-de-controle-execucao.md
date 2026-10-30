@@ -1,5 +1,7 @@
 # 04 — Lista de Pontos de Controle de Execução (Fases 3, 4 e 5)
 
+> Histórico: os itens marcados refletem alegações da execução inicial; avaliações posteriores encontraram lacunas. Consulte o [plano de correção](../planejamento/plano-correcao.md) e o [estado atual](../governanca/estado-atual.md).
+
 Este documento registra os pontos de controle das Fases 3, 4 e 5 do **G6PDApp**, servindo como ledger de persistência permanente do progresso.
 
 ---
