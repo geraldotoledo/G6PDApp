@@ -18,6 +18,7 @@ Atualizado em 30/10/2026. Este índice orienta leitura e autoridade; não substi
 | Como foi feita esta organização? | [RL-001 — Estruturação documental](revisoes/001-estrutura-documental.md) |
 | Como foi consolidado o histórico? | [RL-002 — Consolidação do acervo](revisoes/002-consolidacao-acervo.md) |
 | Como foram organizados os nomes e pastas? | [RL-003 — Organização da documentação](revisoes/003-organizacao-documentacao.md) |
+| Que verificações foram feitas na candidata e no HTML? | [RL-004 — Candidata](revisoes/004-verificacao-candidata.md) e [RL-005 — Inspeção de interface](revisoes/005-revalidacao-visual-interface.md) |
 
 Os documentos ativos estão agrupados em `produto/`, `clinica/`, `planejamento/` e `governanca/`. `init/` conserva o histórico; `revisoes/` contém as avaliações locais. Números presentes no histórico identificam os antigos arquivos, não uma ordem de leitura; `P`, `D` e `RL` identificam propostas, decisões e revisões.
 

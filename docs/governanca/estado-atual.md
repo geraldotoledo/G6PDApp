@@ -18,7 +18,9 @@ O [plano de correção](../planejamento/plano-correcao.md) e o [registro da fase
 
 A [RL-004](../revisoes/004-verificacao-candidata.md) registra a verificação da candidata para revisão pessoal em 30/10/2026, separando testes técnicos, conteúdo clínico pendente e limitações do teste visual. Consulte o Git e o pipeline para saber se houve integração e publicação após essa verificação.
 
-A fase 1 continua com conclusão clínica pendente. Fases 2 e 3 do plano conectado não são declaradas concluídas. Offline integral permanece adiado. Não foi verificado nesta entrega o estado publicado, instaladores Android ou integração real com aplicativos externos de IA.
+Em 30/10/2026, o commit `fc5cafc6f0a1a6944eff8a59c5b870c930b7206f` foi publicado no Pages após conclusão bem-sucedida do pipeline; a base servida retornou 2026.10.3 com 71 regras. A [RL-005](../revisoes/005-revalidacao-visual-interface.md) registra inspeção complementar por SSR, reproduzida pelo Codex nos oito cenários, com dois achados de interface; interação visual em navegador, câmera/OCR real e aparelho físico continuam sem evidência independente nessa inspeção.
+
+A fase 1 continua com conclusão clínica pendente. Fases 2 e 3 do plano conectado não são declaradas concluídas. Offline integral permanece adiado. Não foram verificados instaladores Android ou integração real com aplicativos externos de IA nesta inspeção.
 
 ## Próximas escolhas
 
